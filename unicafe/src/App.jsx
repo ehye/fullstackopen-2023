@@ -8,18 +8,26 @@ const Statistics = ({ good, neutral, bad }) => {
 
   const Display1 = ({ text, counter }) =>
     <div>{text} {counter} %</div>
-
-  return (
-    <div>
-      <h1>statistics</h1>
-      <Display text="good" counter={good} />
-      <Display text="neutral" counter={neutral} />
-      <Display text="bad" counter={bad} />
-      <Display text="all" counter={all} />
-      <Display text="average" counter={(good - bad) / all} />
-      <Display1 text="positive" counter={100 * good / all} />
-    </div>
-  )
+  if (all > 0) {
+    return (
+      <div>
+        <h1>statistics</h1>
+        <Display text="good" counter={good} />
+        <Display text="neutral" counter={neutral} />
+        <Display text="bad" counter={bad} />
+        <Display text="all" counter={all} />
+        <Display text="average" counter={(good - bad) / all} />
+        <Display1 text="positive" counter={100 * good / all} />
+      </div>
+    )
+  } else {
+    return (
+      <div>
+        <h1>statistics</h1>
+        No feedback given
+      </div>
+    )
+  }
 }
 
 const Button = ({ handleClick, text }) =>
