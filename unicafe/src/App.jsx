@@ -3,21 +3,26 @@ import { useState } from 'react'
 const Statistics = ({ good, neutral, bad }) => {
 
   const all = good + neutral + bad
-  const Display = ({ text, counter }) =>
-    <div>{text} {counter}</div>
 
-  const Display1 = ({ text, counter }) =>
-    <div>{text} {counter} %</div>
+  const StatisticLine = ({ text, value }) => {
+    if (text == "positive") {
+      return <div>{text} {value} %</div>
+    }
+    else {
+      return <div>{text} {value}</div>
+    }
+  }
+
   if (all > 0) {
     return (
       <div>
         <h1>statistics</h1>
-        <Display text="good" counter={good} />
-        <Display text="neutral" counter={neutral} />
-        <Display text="bad" counter={bad} />
-        <Display text="all" counter={all} />
-        <Display text="average" counter={(good - bad) / all} />
-        <Display1 text="positive" counter={100 * good / all} />
+        <StatisticLine text="good" value={good} />
+        <StatisticLine text="neutral" value={neutral} />
+        <StatisticLine text="bad" value={bad} />
+        <StatisticLine text="all" value={all} />
+        <StatisticLine text="average" value={(good - bad) / all} />
+        <StatisticLine text="positive" value={100 * good / all} />
       </div>
     )
   } else {
@@ -55,7 +60,6 @@ const App = () => {
       <Button text="good" handleClick={addGood} />
       <Button text="neutral" handleClick={addNeutral} />
       <Button text="bad" handleClick={addBad} />
-
       <Statistics good={good} neutral={neutral} bad={bad} />
     </div>
   )
