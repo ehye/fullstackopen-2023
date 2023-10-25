@@ -12,15 +12,26 @@ const App = () => {
     'The only way to go fast, is to go well.'
   ]
 
-  const [selected, setSelected] = useState(0)
+  const [index, setIndex] = useState(0)
+  const [votes, setVote] = useState(new Uint8Array(anecdotes.length))
 
   const nextAnecdote = () => {
-    return setSelected(Math.floor(Math.random() * (anecdotes.length)))
+    setIndex(Math.floor(Math.random() * (anecdotes.length)))
+  }
+
+  const addVote = () => {
+    const copy = { ...votes }
+    copy[index] += 1
+    setVote(copy)
+    // console.log(index);
+    // console.log(copy);
   }
 
   return (
     <div>
-      <div>{anecdotes[selected]}</div>
+      <div>{anecdotes[index]}</div>
+      <div>has {votes[index]} votes</div>
+      <button onClick={addVote}>vote</button>
       <button onClick={nextAnecdote}>next anecdotes</button>
     </div>
   )
