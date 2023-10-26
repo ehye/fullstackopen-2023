@@ -8,11 +8,18 @@ const App = () => {
 
   const addName = (event) => {
     event.preventDefault()
-    // console.log('button clicked', event.target)
-    const personObject = {
-      name: newName
+    console.log('button clicked', newName)
+
+    if (persons.filter(p => p.name === newName).length > 0) {
+      alert(`${newName} is already added to phonebook`)
     }
-    setPersons(persons.concat(personObject))
+    else {
+      const personObject = {
+        name: newName
+      }
+      setPersons(persons.concat(personObject))
+    }
+
     setNewName('')
   }
 
@@ -34,7 +41,7 @@ const App = () => {
       </form>
       <h2>Numbers</h2>
       {persons.map(person => <div key={person.name}>{person.name}</div>)}
-      <div>debug: {newName}</div>
+      {/* <div>debug: {newName}</div> */}
     </div>
   )
 }
