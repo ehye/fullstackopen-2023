@@ -1,6 +1,73 @@
 import { useState, useEffect } from 'react'
 import personService from './services/person'
 
+const Filter = ({ filter, onFilterChange }) => (
+  <div>
+    filter shown with
+    <input value={filter} onChange={onFilterChange} />
+  </div>
+)
+
+const PersonForm = ({
+  addPerson,
+  newName,
+  handleNameChange,
+  newNumber,
+  handleNumberChange,
+}) => (
+  <form onSubmit={addPerson}>
+    <div>
+      name: <input value={newName} onChange={handleNameChange} />
+    </div>
+    <div>
+      number: <input value={newNumber} onChange={handleNumberChange} />
+    </div>
+    <div>
+      <button type="submit">add</button>
+    </div>
+  </form>
+)
+const addPerson = (event) => {
+  event.preventDefault()
+  console.log('button clicked', newName)
+
+  if (persons.filter((p) => p.name === newName).length > 0) {
+    alert(`${newName} is already added to phonebook`)
+  } else {
+    const personObject = {
+      name: newName,
+      number: newNumber,
+    }
+    personService.create(personObject)
+    setPersons(persons.concat(personObject))
+  }
+
+  setNewName('')
+  setNewNumber('')
+}
+
+const Persons = ({ persons, filter }) => {
+  const deletePerson = (event) => {
+    if (window.confirm(`Delete ${event.target.name} ?`)) {
+      personService.delete(event.target.id)
+      
+    }
+  }
+
+  return persons
+    .filter((p) => p.name.toUpperCase().match(filter.toUpperCase()))
+    .map((person) => (
+      <div key={person.id}>
+        <div>
+          {person.name} {person.number}
+          <button id={person.id} name={person.name} onClick={deletePerson}>
+            delete
+          </button>
+        </div>
+      </div>
+    ))
+}
+
 const App = () => {
   const [persons, setPersons] = useState([])
   const [newName, setNewName] = useState('')
@@ -12,26 +79,6 @@ const App = () => {
       setPersons(initialPersons)
     })
   }, [])
-  console.log('render', persons.length, 'persons', persons)
-
-  const addPerson = (event) => {
-    event.preventDefault()
-    console.log('button clicked', newName)
-
-    if (persons.filter((p) => p.name === newName).length > 0) {
-      alert(`${newName} is already added to phonebook`)
-    } else {
-      const personObject = {
-        name: newName,
-        number: newNumber,
-      }
-      personService.create(personObject)
-      setPersons(persons.concat(personObject))
-    }
-
-    setNewName('')
-    setNewNumber('')
-  }
 
   const handleNameChange = (event) => {
     setNewName(event.target.value)
@@ -46,44 +93,20 @@ const App = () => {
     setSearch(event.target.value)
   }
 
-  const Filter = () => (
-    <div>
-      filter shown with
-      <input autoFocus value={filter} onChange={handleFilterChange} />
-    </div>
-  )
-
-  const PersonForm = () => (
-    <form onSubmit={addPerson}>
-      <div>
-        name: <input value={newName} onChange={handleNameChange} />
-      </div>
-      <div>
-        number: <input value={newNumber} onChange={handleNumberChange} />
-      </div>
-      <div>
-        <button type="submit">add</button>
-      </div>
-    </form>
-  )
-
-  const Persons = () =>
-    persons
-      .filter((p) => p.name.toUpperCase().match(filter.toUpperCase()))
-      .map((person) => (
-        <div key={person.name}>
-          {person.name} {person.number}
-        </div>
-      ))
-
   return (
     <div>
       <h2>Phonebook</h2>
-      <Filter />
+      <Filter filter={filter} onFilterChange={handleFilterChange} />
       <h3>add a new</h3>
-      <PersonForm />
+      <PersonForm
+        addPerson={addPerson}
+        newName={newName}
+        handleNameChange={handleNameChange}
+        newNumber={newNumber}
+        handleNumberChange={handleNumberChange}
+      />
       <h3>Numbers</h3>
-      <Persons />
+      <Persons persons={persons} filter={filter} />
     </div>
   )
 }
