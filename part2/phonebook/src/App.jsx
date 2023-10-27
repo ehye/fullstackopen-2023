@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import axios from 'axios'
+import personService from './services/person'
 
 const App = () => {
   const [persons, setPersons] = useState([])
@@ -8,33 +8,24 @@ const App = () => {
   const [filter, setSearch] = useState('')
 
   useEffect(() => {
-    console.log('effect')
-    axios
-      .get('http://localhost:3001/persons')
-      .then(response => {
-        console.log('promise fulfilled')
-        setPersons(response.data)
-      })
+    personService.getAll().then((initialPersons) => {
+      setPersons(initialPersons)
+    })
   }, [])
-  console.log('render', persons.length, 'notes')
+  console.log('render', persons.length, 'persons', persons)
 
   const addPerson = (event) => {
     event.preventDefault()
     console.log('button clicked', newName)
 
-    if (persons.filter(p => p.name === newName).length > 0) {
+    if (persons.filter((p) => p.name === newName).length > 0) {
       alert(`${newName} is already added to phonebook`)
-    }
-    else {
+    } else {
       const personObject = {
         name: newName,
-        number: newNumber
+        number: newNumber,
       }
-      axios
-        .post('http://localhost:3001/persons', personObject)
-        .then(response => {
-          console.log(response)
-        })
+      personService.create(personObject)
       setPersons(persons.concat(personObject))
     }
 
@@ -56,7 +47,10 @@ const App = () => {
   }
 
   const Filter = () => (
-    <div>filter shown with<input autoFocus value={filter} onChange={handleFilterChange} /></div>
+    <div>
+      filter shown with
+      <input autoFocus value={filter} onChange={handleFilterChange} />
+    </div>
   )
 
   const PersonForm = () => (
@@ -73,13 +67,14 @@ const App = () => {
     </form>
   )
 
-  const Persons = () => (
-    persons.filter(p => p.name.toUpperCase().match(filter.toUpperCase())).map(person =>
-      <div key={person.name}>
-        {person.name} {person.number}
-      </div>
-    )
-  )
+  const Persons = () =>
+    persons
+      .filter((p) => p.name.toUpperCase().match(filter.toUpperCase()))
+      .map((person) => (
+        <div key={person.name}>
+          {person.name} {person.number}
+        </div>
+      ))
 
   return (
     <div>
