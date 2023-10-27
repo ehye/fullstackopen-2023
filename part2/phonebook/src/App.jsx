@@ -32,6 +32,7 @@ const App = () => {
 
   const handleNameChange = (event) => {
     setNewName(event.target.value)
+    event.target.e
   }
 
   const handleNumberChange = (event) => {
@@ -42,28 +43,40 @@ const App = () => {
     setSearch(event.target.value)
   }
 
+  const Filter = () => (
+    <div>filter shown with<input autoFocus value={filter} onChange={handleFilterChange} /></div>
+  )
+
+  const PersonForm = () => (
+    <form onSubmit={addPerson}>
+      <div>
+        name: <input value={newName} onChange={handleNameChange} />
+      </div>
+      <div>
+        number: <input value={newNumber} onChange={handleNumberChange} />
+      </div>
+      <div>
+        <button type="submit">add</button>
+      </div>
+    </form>
+  )
+
+  const Persons = () => (
+    persons.filter(p => p.name.toUpperCase().match(filter.toUpperCase())).map(person =>
+      <div key={person.name}>
+        {person.name} {person.number}
+      </div>
+    )
+  )
+
   return (
     <div>
       <h2>Phonebook</h2>
-      <div>filter shown with<input value={filter} onChange={handleFilterChange} /></div>
-      <h2>add a new</h2>
-      <form onSubmit={addPerson}>
-        <div>
-          name: <input value={newName} onChange={handleNameChange} />
-        </div>
-        <div>
-          number: <input value={newNumber} onChange={handleNumberChange} />
-        </div>
-        <div>
-          <button type="submit">add</button>
-        </div>
-      </form>
-      <h2>Numbers</h2>
-      {persons.filter(p => p.name.toUpperCase().match(filter.toUpperCase())).map(person =>
-        <div key={person.name}>
-          {person.name} {person.number}
-        </div>
-      )}
+      <Filter />
+      <h3>add a new</h3>
+      <PersonForm />
+      <h3>Numbers</h3>
+      <Persons />
     </div>
   )
 }
