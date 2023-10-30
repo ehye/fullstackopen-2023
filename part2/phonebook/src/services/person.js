@@ -12,9 +12,16 @@ const create = (newObject) => {
 
 }
 
-const update = (id, newObject) => {
+const update = (id, newObject, setAddedMessage) => {
     const request = axios.put(`${baseUrl}/${id}`, newObject)
-    return request.then((response) => response.data)
+    return request.then((response) => response.data).catch((error) => {
+        setAddedMessage(
+            `Information of '${newObject.newName}' has already been removed from server`
+        )
+        setTimeout(() => {
+            setAddedMessage(null)
+        }, 5000)
+    })
 }
 
 const deleteById = (id) => {

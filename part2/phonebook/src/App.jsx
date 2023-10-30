@@ -67,7 +67,7 @@ const App = () => {
             name: newName,
             number: newNumber,
           }
-          personService.update(id, personObject)
+          personService.update(id, personObject, setAddedMessage)
         }
       } else {
         const personObject = {
