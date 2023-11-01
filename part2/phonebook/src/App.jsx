@@ -102,7 +102,6 @@ const App = () => {
 
   const handleNameChange = (event) => {
     setNewName(event.target.value)
-    event.target.e
   }
 
   const handleNumberChange = (event) => {
