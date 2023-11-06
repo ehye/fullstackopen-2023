@@ -31,11 +31,63 @@ const Persons = ({ persons, filter }) => {
 }
 
 const Notification = ({ message }) => {
-  if (message === null) {
+  if (message === null || message === '') {
     return null
   }
 
   return <h1>{message}</h1>
+}
+
+const PersonForm = ({
+  persons,
+  newName,
+  newNumber,
+  updatePerson,
+  createPerson,
+  cleanInput,
+  handleNameChange,
+  handleNumberChange,
+}) => {
+  const addPerson = (event) => {
+    event.preventDefault()
+    const matchedPersonsArray = persons.filter((p) => p.name === newName)
+    if (matchedPersonsArray.length > 0) {
+      if (
+        window.confirm(
+          `${newName} is already added to phonebook, replace the old number with a new one?`
+        )
+      ) {
+        const id = matchedPersonsArray[0].id
+        const personObject = {
+          id: id,
+          name: newName,
+          number: newNumber,
+        }
+        updatePerson(id, personObject)
+      }
+    } else {
+      const personObject = {
+        name: newName,
+        number: newNumber,
+      }
+      createPerson(personObject)
+    }
+
+    cleanInput()
+  }
+  return (
+    <form onSubmit={addPerson}>
+      <div>
+        name: <input value={newName} onChange={handleNameChange} />
+      </div>
+      <div>
+        number: <input value={newNumber} onChange={handleNumberChange} />
+      </div>
+      <div>
+        <button type="submit">add</button>
+      </div>
+    </form>
+  )
 }
 
 const App = () => {
@@ -43,7 +95,7 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filter, setSearch] = useState('')
-  const [addedMessage, setAddedMessage] = useState('some error happened...')
+  const [addedMessage, setAddedMessage] = useState('')
 
   useEffect(() => {
     personService.getAll().then((initialPersons) => {
@@ -51,53 +103,20 @@ const App = () => {
     })
   }, [])
 
-  const PersonForm = () => {
-    const addPerson = (event) => {
-      event.preventDefault()
-      const matchedPersonsArray = persons.filter((p) => p.name === newName)
-      if (matchedPersonsArray.length > 0) {
-        if (
-          window.confirm(
-            `${newName} is already added to phonebook, replace the old number with a new one?`
-          )
-        ) {
-          const id = matchedPersonsArray[0].id
-          const personObject = {
-            id: id,
-            name: newName,
-            number: newNumber,
-          }
-          personService.update(id, personObject, setAddedMessage)
-        }
-      } else {
-        const personObject = {
-          name: newName,
-          number: newNumber,
-        }
-        personService.create(personObject)
-        setPersons(persons.concat(personObject))
-        setAddedMessage(`Added '${newName}'`)
-        setTimeout(() => {
-          setAddedMessage(null)
-        }, 5000)
-      }
-
-      setNewName('')
-      setNewNumber('')
-    }
-    return (
-      <form onSubmit={addPerson}>
-        <div>
-          name: <input value={newName} onChange={handleNameChange} />
-        </div>
-        <div>
-          number: <input value={newNumber} onChange={handleNumberChange} />
-        </div>
-        <div>
-          <button type="submit">add</button>
-        </div>
-      </form>
-    )
+  function updatePerson(id, personObject) {
+    personService.update(id, personObject, setAddedMessage)
+  }
+  function createPerson(personObject) {
+    personService.create(personObject)
+    setPersons(persons.concat(personObject))
+    setAddedMessage(`Added '${newName}'`)
+    setTimeout(() => {
+      setAddedMessage(null)
+    }, 5000)
+  }
+  function cleanInput() {
+    setNewName('')
+    setNewNumber('')
   }
 
   const handleNameChange = (event) => {
@@ -118,7 +137,16 @@ const App = () => {
       <Notification message={addedMessage} />
       <Filter filter={filter} onFilterChange={handleFilterChange} />
       <h3>add a new</h3>
-      <PersonForm />
+      <PersonForm
+        persons={persons}
+        newName={newName}
+        newNumber={newNumber}
+        updatePerson={updatePerson}
+        createPerson={createPerson}
+        cleanInput={cleanInput}
+        handleNameChange={handleNameChange}
+        handleNumberChange={handleNumberChange}
+      />
       <h3>Numbers</h3>
       <Persons persons={persons} filter={filter} />
     </div>

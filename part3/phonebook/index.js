@@ -1,7 +1,9 @@
 const express = require('express')
 const morgan = require('morgan')
+const cors = require('cors')
 const app = express()
 
+app.use(cors())
 app.use(express.json())
 morgan.token('body', req => {
     return JSON.stringify(req.body)
@@ -48,6 +50,7 @@ app.get('/', (request, response) => {
 app.get('/api/persons', (request, response) => {
     response.json(persons)
 })
+
 app.get('/api/persons/:id', (request, response) => {
 
     const person = persons.find(p => p.id === Number(request.params.id))
