@@ -48,18 +48,29 @@ app.get('/info', (request, response) => {
 })
 
 app.delete('/api/persons/:id', (request, response) => {
-    notes = notes.filter(note => note.id !== Number(request.params.id))
+    persons = persons.filter(note => note.id !== Number(request.params.id))
     response.status(204).end()
 })
 
 app.post('/api/persons', (request, response) => {
-    var person = {
-        "id": getRandomIntInclusive(1, 1000),
-        "name": request.body.name,
-        "number": request.body.number
+    if (persons.some(p => p.name === request.body.name)) {
+        response.status(400).json({ error: 'name must be unique' })
     }
-    persons.push(person)
-    response.send(person)
+    if (request.body.name == null || request.body.number == null) {
+        response.status(400).json({ error: 'name is empty' })
+    }
+    if (request.body.number == null) {
+        response.status(400).json({ error: 'number is empty' })
+    }
+    else {
+        var person = {
+            "id": getRandomIntInclusive(1, 1000),
+            "name": request.body.name,
+            "number": request.body.number
+        }
+        persons.push(person)
+        response.status(200).send(person)
+    }
 })
 
 const PORT = 3001
