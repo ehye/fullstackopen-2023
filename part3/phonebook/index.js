@@ -65,7 +65,7 @@ app.get('/api/persons/:id', (request, response, next) => {
 })
 
 app.get('/info', (request, response) => {
-    response.send(`<div>Phonebook has info for ${Persons.length} people</div><br /><div>${new Date()}</div>`)
+    response.send(`<div>Phonebook has info for ${PhoneBook.length} people</div><br /><div>${new Date()}</div>`)
 })
 
 app.put('/api/persons/:id', (request, response, next) => {
@@ -113,9 +113,3 @@ const PORT = process.env.PORT
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
 })
-
-// function getRandomIntInclusive(min, max) {
-//     min = Math.ceil(min);
-//     max = Math.floor(max);
-//     return Math.floor(Math.random() * (max - min + 1) + min); // The maximum is inclusive and the minimum is inclusive
-// }
