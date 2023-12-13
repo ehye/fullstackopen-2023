@@ -68,6 +68,20 @@ app.get('/info', (request, response) => {
     response.send(`<div>Phonebook has info for ${Persons.length} people</div><br /><div>${new Date()}</div>`)
 })
 
+app.put('/api/persons/:id', (request, response, next) => {
+    const body = request.body
+
+    const phoneBook = {
+        name: body.name,
+        number: body.number,
+    }
+    PhoneBook.findByIdAndUpdate(request.params.id, phoneBook, { new: true })
+        .then(updatedPerson => {
+            response.json(updatedPerson)
+        })
+        .catch(error => next(error))
+})
+
 app.delete('/api/persons/:id', (request, response, next) => {
     PhoneBook.findByIdAndDelete(request.params.id)
         .then(result => {
