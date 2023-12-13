@@ -78,9 +78,12 @@ app.get('/info', (request, response) => {
     response.send(`<div>Phonebook has info for ${Persons.length} people</div><br /><div>${new Date()}</div>`)
 })
 
-app.delete('/api/persons/:id', (request, response) => {
-    persons = persons.filter(note => note.id !== Number(request.params.id))
-    response.status(204).end()
+app.delete('/api/persons/:id', (request, response, next) => {
+    PhoneBook.findByIdAndDelete(request.params.id)
+        .then(result => {
+            response.status(204).end()
+        })
+        .catch(error => next(error))
 })
 
 app.post('/api/persons', (request, response) => {
