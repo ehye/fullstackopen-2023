@@ -1,7 +1,10 @@
+require('dotenv').config()
 const express = require('express')
 const morgan = require('morgan')
 const cors = require('cors')
 const app = express()
+
+const PhoneBook = require('./models/person')
 
 app.use(cors())
 app.use(express.json())
@@ -50,7 +53,15 @@ app.get('/', (request, response) => {
 })
 
 app.get('/api/persons', (request, response) => {
-    response.json(persons)
+    PhoneBook.find({}).then(result => {
+        if (result.length > 0) {
+            result.forEach(person => {
+                console.log(person.name, person.number)
+            })
+            // mongoose.connection.close()
+        }
+        response.json(result)
+    })
 })
 
 app.get('/api/persons/:id', (request, response) => {
@@ -64,7 +75,7 @@ app.get('/api/persons/:id', (request, response) => {
 })
 
 app.get('/info', (request, response) => {
-    response.send(`<div>Phonebook has info for ${persons.length} people</div><br /><div>${new Date()}</div>`)
+    response.send(`<div>Phonebook has info for ${Persons.length} people</div><br /><div>${new Date()}</div>`)
 })
 
 app.delete('/api/persons/:id', (request, response) => {
@@ -73,33 +84,31 @@ app.delete('/api/persons/:id', (request, response) => {
 })
 
 app.post('/api/persons', (request, response) => {
-    if (persons.some(p => p.name === request.body.name)) {
-        response.status(400).json({ error: 'name must be unique' })
+    const body = request.body
+
+    if (body === undefined) {
+        return response.status(400).json({ error: 'content missing' })
     }
-    if (request.body.name == null || request.body.number == null) {
-        response.status(400).json({ error: 'name is empty' })
-    }
-    if (request.body.number == null) {
-        response.status(400).json({ error: 'number is empty' })
-    }
-    else {
-        var person = {
-            "id": getRandomIntInclusive(1, 1000),
-            "name": request.body.name,
-            "number": request.body.number
-        }
-        persons.push(person)
-        response.status(200).send(person)
-    }
+
+    const phoneBook = new PhoneBook({
+        name: body.name,
+        number: body.number,
+    })
+
+    phoneBook.save()
+        .then(result => {
+            response.json(result)
+        })
+        .catch(error => next(error))
 })
 
-const PORT = 3001
+const PORT = process.env.PORT
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
 })
 
-function getRandomIntInclusive(min, max) {
-    min = Math.ceil(min);
-    max = Math.floor(max);
-    return Math.floor(Math.random() * (max - min + 1) + min); // The maximum is inclusive and the minimum is inclusive
-}
+// function getRandomIntInclusive(min, max) {
+//     min = Math.ceil(min);
+//     max = Math.floor(max);
+//     return Math.floor(Math.random() * (max - min + 1) + min); // The maximum is inclusive and the minimum is inclusive
+// }
