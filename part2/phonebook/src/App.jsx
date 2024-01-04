@@ -136,7 +136,6 @@ const App = () => {
         setAddedMessage(`Added '${newName}'`)
       })
       .catch((error) => {
-        console.log(error.response.data.error)
         setErrorMessage(error.response.data.error)
       })
     setTimeout(() => {
