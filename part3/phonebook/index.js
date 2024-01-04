@@ -2,9 +2,8 @@ require('dotenv').config()
 const express = require('express')
 const morgan = require('morgan')
 const cors = require('cors')
-const app = express()
-
 const PhoneBook = require('./models/person')
+const app = express()
 
 app.use(cors())
 app.use(express.json())
@@ -25,16 +24,10 @@ app.use(morgan(function (tokens, req, res) {
 
 app.use(express.static('dist'))
 
-const errorHandler = (error, request, response, next) => {
-    console.error(error.message)
-
-    if (error.name === 'CastError') {
-        return response.status(400).send({ error: 'malformatted id' })
-    }
-
-    next(error)
-}
-app.use(errorHandler)
+const PORT = process.env.PORT
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`)
+})
 
 app.get('/', (request, response) => {
     response.send('<h1>Hello World!</h1>')
@@ -46,7 +39,6 @@ app.get('/api/persons', (request, response) => {
             result.forEach(person => {
                 console.log(person.name, person.number)
             })
-            // mongoose.connection.close()
         }
         response.json(result)
     })
@@ -69,13 +61,12 @@ app.get('/info', (request, response) => {
 })
 
 app.put('/api/persons/:id', (request, response, next) => {
-    const body = request.body
-
-    const phoneBook = {
-        name: body.name,
-        number: body.number,
+    let phoneBook = {
+        name: request.body.name,
+        number: request.body.number,
     }
-    PhoneBook.findByIdAndUpdate(request.params.id, phoneBook, { new: true })
+
+    PhoneBook.findByIdAndUpdate(request.params.id, phoneBook, { new: true, runValidators: true, context: 'query' })
         .then(updatedPerson => {
             response.json(updatedPerson)
         })
@@ -90,14 +81,10 @@ app.delete('/api/persons/:id', (request, response, next) => {
         .catch(error => next(error))
 })
 
-app.post('/api/persons', (request, response) => {
+app.post('/api/persons', (request, response, next) => {
     const body = request.body
 
-    if (body === undefined) {
-        return response.status(400).json({ error: 'content missing' })
-    }
-
-    const phoneBook = new PhoneBook({
+    let phoneBook = new PhoneBook({
         name: body.name,
         number: body.number,
     })
@@ -109,7 +96,16 @@ app.post('/api/persons', (request, response) => {
         .catch(error => next(error))
 })
 
-const PORT = process.env.PORT
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`)
-})
+const errorHandler = (error, request, response, next) => {
+    console.error(error.message)
+
+    if (error.name === 'CastError') {
+        return response.status(400).send({ error: 'malformatted id' })
+    } else if (error.name === 'ValidationError') {
+        return response.status(400).json({ error: error.message })
+    }
+
+    next(error)
+}
+
+app.use(errorHandler)
