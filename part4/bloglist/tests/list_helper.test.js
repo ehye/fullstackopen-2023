@@ -1,6 +1,5 @@
 const listHelper = require('../utils/list_helper')
 
-const maxLikes = 100
 const blogs = [
   {
     _id: '5a422a851b54a676234d17f7',
@@ -32,14 +31,6 @@ const blogs = [
     author: 'Robert C. Martin',
     url: 'http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.htmll',
     likes: 10,
-    __v: 0,
-  },
-  {
-    _id: '5a422ba71b54a676234d17fb',
-    title: 'TDD harms architecture',
-    author: 'Robert C. Martin',
-    url: 'http://blog.cleancoder.com/uncle-bob/2017/03/03/TDD-Harms-Architecture.html',
-    likes: maxLikes,
     __v: 0,
   },
   {
@@ -81,16 +72,26 @@ describe('total likes', () => {
 describe('favorite blog', () => {
   test('if there are many top favorites, it is enough to return one of them', () => {
     const result = listHelper.favoriteBlog(blogs)
-    expect(result.likes).toEqual(maxLikes)
+    expect(result.likes).toEqual(12)
   })
 })
 
-describe('favorite blog', () => {
-  test.only('returns the author who has the largest amount of blogs', () => {
+describe('most blogs', () => {
+  test('returns the author who has the largest amount of blogs', () => {
     const result = listHelper.mostBlogs(blogs)
     expect(result).toEqual({
-      author: 'Robert C. Martin',
-      blogs: 3,
+      author: 'Edsger W. Dijkstra',
+      blogs: 2,
+    })
+  })
+})
+
+describe('most likes', () => {
+  test('returns the author whose blog posts have the largest amount of likes', () => {
+    const result = listHelper.mostLikes(blogs)
+    expect(result).toEqual({
+      author: 'Edsger W. Dijkstra',
+      likes: 17,
     })
   })
 })
