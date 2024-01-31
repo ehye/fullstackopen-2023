@@ -55,58 +55,78 @@ beforeEach(async () => {
   await blogObject.save()
 }, 10000)
 
-test('blogs are returned as json', async () => {
-  const response = await api
-    .get('/api/blogs')
-    .expect(200)
-    .expect('Content-Type', /application\/json/)
-  expect(JSON.parse(response.text).length).toEqual(2)
-})
+describe('viewing blogs', () => {
+  test('blogs are returned as json', async () => {
+    const response = await api
+      .get('/api/blogs')
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+    expect(response.body.length).toEqual(2)
+  })
 
-test('the unique identifier property of the blog posts is named id', async () => {
-  const response = await api
-    .get('/api/blogs')
-    .expect(200)
-    .expect('Content-Type', /application\/json/)
-  const result = JSON.parse(response.text)
-  result.forEach((element) => {
-    expect(element.id).toBeDefined()
+  test('the unique identifier property of the blog posts is named id', async () => {
+    const response = await api
+      .get('/api/blogs')
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+    const result = response.body
+    result.forEach((element) => {
+      expect(element.id).toBeDefined()
+    })
   })
 })
 
-test('post is saved correctly to the database', async () => {
-  const blog = {
-    title: 'React patterns',
-    author: 'Michael Chan',
-    url: 'https://reactpatterns.com/',
-    likes: 7,
-  }
-  var res = await api.post('/api/blogs').send(blog)
-  const response = await api.get('/api/blogs/' + JSON.parse(res.text).id)
+describe('addition of a new note', () => {
+  test('post is saved correctly to the database', async () => {
+    const blog = {
+      title: 'React patterns',
+      author: 'Michael Chan',
+      url: 'https://reactpatterns.com/',
+      likes: 7,
+    }
+    var res = await api.post('/api/blogs').send(blog)
+    const response = await api.get('/api/blogs/' + res.body.id)
 
-  const jObj = JSON.parse(response.text)
-  expect(jObj.title).toEqual(blog.title)
-  expect(jObj.author).toEqual(blog.author)
-  expect(jObj.url).toEqual(blog.url)
-  expect(jObj.likes).toEqual(blog.likes)
+    const jObj = response.body
+    expect(jObj.title).toEqual(blog.title)
+    expect(jObj.author).toEqual(blog.author)
+    expect(jObj.url).toEqual(blog.url)
+    expect(jObj.likes).toEqual(blog.likes)
+  })
+
+  test('if the likes property is missing, it will default to the value 0', async () => {
+    const blog = {
+      title: 'React patterns',
+      author: 'Michael Chan',
+      url: 'https://reactpatterns.com/',
+    }
+    var res = await api.post('/api/blogs').send(blog)
+    const response = await api.get('/api/blogs/' + res.body.id)
+
+    const jObj = response.body
+    expect(jObj.likes).toEqual(0)
+  })
+
+  test('if the title or url properties are missing, responds the status code 400', async () => {
+    const blog = { author: 'Michael Chan' }
+    var response = await api.post('/api/blogs').send(blog).expect(400)
+  })
 })
 
-test('if the likes property is missing, it will default to the value 0', async () => {
-  const blog = {
-    title: 'React patterns',
-    author: 'Michael Chan',
-    url: 'https://reactpatterns.com/',
-  }
-  var res = await api.post('/api/blogs').send(blog)
-  const response = await api.get('/api/blogs/' + JSON.parse(res.text).id)
+describe('deletion of a note', () => {
+  test('succeeds with status code 204 if id is valid', async () => {
+    const blogToDelete = initialBlogs[0]
 
-  const jObj = JSON.parse(response.text)
-  expect(jObj.likes).toEqual(0)
-})
+    await api.delete(`/api/blogs/${blogToDelete._id}`).expect(204)
 
-test('if the title or url properties are missing, responds the status code 400', async () => {
-  const blog = { author: 'Michael Chan' }
-  var response = await api.post('/api/blogs').send(blog).expect(400)
+    const blogsAtEnd = await api.get('/api/blogs')
+
+    expect(blogsAtEnd.body).toHaveLength(1)
+
+    const ids = blogsAtEnd.body.map((r) => r.id)
+
+    expect(ids).not.toContain(blogToDelete.id)
+  })
 })
 
 afterAll(async () => {
