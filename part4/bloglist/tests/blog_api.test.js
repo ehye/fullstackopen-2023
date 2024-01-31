@@ -74,6 +74,23 @@ test('the unique identifier property of the blog posts is named id', async () =>
   })
 })
 
+test.only('post is saved correctly to the database', async () => {
+  const blog = {
+    title: 'React patterns',
+    author: 'Michael Chan',
+    url: 'https://reactpatterns.com/',
+    likes: 7,
+  }
+  var res = await api.post('/api/blogs').send(blog)
+  const response = await api.get('/api/blogs/' + JSON.parse(res.text).id)
+
+  const jObj = JSON.parse(response.text)
+  expect(jObj.title).toEqual(blog.title)
+  expect(jObj.author).toEqual(blog.author)
+  expect(jObj.url).toEqual(blog.url)
+  expect(jObj.likes).toEqual(blog.likes)
+})
+
 afterAll(async () => {
   await mongoose.connection.close()
 })
