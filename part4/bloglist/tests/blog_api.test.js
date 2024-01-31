@@ -55,12 +55,23 @@ beforeEach(async () => {
   await blogObject.save()
 }, 10000)
 
-test.only('blogs are returned as json', async () => {
-  const result = await api
+test('blogs are returned as json', async () => {
+  const response = await api
     .get('/api/blogs')
     .expect(200)
     .expect('Content-Type', /application\/json/)
-  expect(JSON.parse(result.text).length).toEqual(2)
+  expect(JSON.parse(response.text).length).toEqual(2)
+})
+
+test('the unique identifier property of the blog posts is named id', async () => {
+  const response = await api
+    .get('/api/blogs')
+    .expect(200)
+    .expect('Content-Type', /application\/json/)
+  const result = JSON.parse(response.text)
+  result.forEach((element) => {
+    expect(element.id).toBeDefined()
+  })
 })
 
 afterAll(async () => {
