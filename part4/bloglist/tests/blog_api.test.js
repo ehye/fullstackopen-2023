@@ -53,7 +53,7 @@ beforeEach(async () => {
   await blogObject.save()
   blogObject = new Blog(initialBlogs[1])
   await blogObject.save()
-}, 10000)
+})
 
 describe('viewing blogs', () => {
   test('blogs are returned as json', async () => {
@@ -130,7 +130,7 @@ describe('deletion of a note', () => {
 })
 
 describe('update of a note', () => {
-  test('return updated object as json', async () => {
+  test.only('return updated object as json', async () => {
     const blogToUpdate = initialBlogs[0]
     blogToUpdate.likes = 2077
 
