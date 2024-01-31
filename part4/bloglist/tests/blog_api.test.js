@@ -104,6 +104,11 @@ test('if the likes property is missing, it will default to the value 0', async (
   expect(jObj.likes).toEqual(0)
 })
 
+test('if the title or url properties are missing, responds the status code 400', async () => {
+  const blog = { author: 'Michael Chan' }
+  var response = await api.post('/api/blogs').send(blog).expect(400)
+})
+
 afterAll(async () => {
   await mongoose.connection.close()
 })
