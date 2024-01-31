@@ -74,7 +74,7 @@ test('the unique identifier property of the blog posts is named id', async () =>
   })
 })
 
-test.only('post is saved correctly to the database', async () => {
+test('post is saved correctly to the database', async () => {
   const blog = {
     title: 'React patterns',
     author: 'Michael Chan',
@@ -89,6 +89,19 @@ test.only('post is saved correctly to the database', async () => {
   expect(jObj.author).toEqual(blog.author)
   expect(jObj.url).toEqual(blog.url)
   expect(jObj.likes).toEqual(blog.likes)
+})
+
+test('if the likes property is missing, it will default to the value 0', async () => {
+  const blog = {
+    title: 'React patterns',
+    author: 'Michael Chan',
+    url: 'https://reactpatterns.com/',
+  }
+  var res = await api.post('/api/blogs').send(blog)
+  const response = await api.get('/api/blogs/' + JSON.parse(res.text).id)
+
+  const jObj = JSON.parse(response.text)
+  expect(jObj.likes).toEqual(0)
 })
 
 afterAll(async () => {
