@@ -129,6 +129,21 @@ describe('deletion of a note', () => {
   })
 })
 
+describe('update of a note', () => {
+  test('return updated object as json', async () => {
+    const blogToUpdate = initialBlogs[0]
+    blogToUpdate.likes = 2077
+
+    const response = await api
+      .put(`/api/blogs/${blogToUpdate._id}`)
+      .send(blogToUpdate)
+
+    const blogAfterUpdate = await api.get('/api/blogs/' + response.body.id)
+
+    expect(blogAfterUpdate.body.likes).toBe(2077)
+  })
+})
+
 afterAll(async () => {
   await mongoose.connection.close()
 })
