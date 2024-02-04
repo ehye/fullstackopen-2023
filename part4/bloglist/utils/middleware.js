@@ -29,12 +29,9 @@ const errorHandler = (error, request, response, next) => {
 const tokenExtractor = (request, response, next) => {
   const authorization = request.get('authorization')
   if (authorization && authorization.startsWith('Bearer ')) {
-    // return authorization.replace('Bearer ', '')
-    console.log('Bearer ')
     request.token = authorization.replace('Bearer ', '')
   }
   next()
-  // return null
 }
 
 module.exports = {
