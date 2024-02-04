@@ -41,7 +41,7 @@ describe('when there is initially one user in db', () => {
   })
 })
 
-test.only('invalid users are not created', async () => {
+test('invalid users are not created', async () => {
   const newUser = {
     username: '',
     password: '',

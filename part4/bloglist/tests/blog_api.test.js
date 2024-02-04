@@ -59,6 +59,7 @@ describe('viewing blogs', () => {
   test('blogs are returned as json', async () => {
     const response = await api
       .get('/api/blogs')
+      .set('Authorization', `Bearer ${process.env.TOKEN}`)
       .expect(200)
       .expect('Content-Type', /application\/json/)
     expect(response.body.length).toEqual(2)
@@ -67,6 +68,7 @@ describe('viewing blogs', () => {
   test('the unique identifier property of the blog posts is named id', async () => {
     const response = await api
       .get('/api/blogs')
+      .set('Authorization', `Bearer ${process.env.TOKEN}`)
       .expect(200)
       .expect('Content-Type', /application\/json/)
     const result = response.body
@@ -76,7 +78,7 @@ describe('viewing blogs', () => {
   })
 })
 
-describe('addition of a new note', () => {
+describe('addition of a new blog', () => {
   test('post is saved correctly to the database', async () => {
     const blog = {
       title: 'React patterns',
@@ -84,9 +86,14 @@ describe('addition of a new note', () => {
       url: 'https://reactpatterns.com/',
       likes: 7,
     }
-    var res = await api.post('/api/blogs').send(blog)
-    const response = await api.get('/api/blogs/' + res.body.id)
+    var res = await api
+      .post('/api/blogs')
+      .send(blog)
+      .set('Authorization', `Bearer ${process.env.TOKEN}`)
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
 
+    const response = await api.get('/api/blogs/' + res.body.id)
     const jObj = response.body
     expect(jObj.title).toEqual(blog.title)
     expect(jObj.author).toEqual(blog.author)
@@ -100,24 +107,41 @@ describe('addition of a new note', () => {
       author: 'Michael Chan',
       url: 'https://reactpatterns.com/',
     }
-    var res = await api.post('/api/blogs').send(blog)
-    const response = await api.get('/api/blogs/' + res.body.id)
+    var res = await api
+      .post('/api/blogs')
+      .send(blog)
+      .set('Authorization', `Bearer ${process.env.TOKEN}`)
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
 
+    const response = await api.get('/api/blogs/' + res.body.id)
     const jObj = response.body
     expect(jObj.likes).toEqual(0)
   })
 
   test('if the title or url properties are missing, responds the status code 400', async () => {
     const blog = { author: 'Michael Chan' }
-    var response = await api.post('/api/blogs').send(blog).expect(400)
+    var response = await api
+      .post('/api/blogs')
+      .send(blog)
+      .set('Authorization', `Bearer ${process.env.TOKEN}`)
+      .expect(400)
+  })
+
+  test('fails with 401 Unauthorized if a token is not provided', async () => {
+    const blog = { author: 'Michael Chan' }
+    var response = await api.post('/api/blogs').send(blog).expect(401)
   })
 })
 
-describe('deletion of a note', () => {
+describe('deletion of a blog', () => {
   test('succeeds with status code 204 if id is valid', async () => {
     const blogToDelete = initialBlogs[0]
 
-    await api.delete(`/api/blogs/${blogToDelete._id}`).expect(204)
+    await api
+      .delete(`/api/blogs/${blogToDelete._id}`)
+      .set('Authorization', `Bearer ${process.env.TOKEN}`)
+      .expect(204)
 
     const blogsAtEnd = await api.get('/api/blogs')
 
@@ -129,16 +153,21 @@ describe('deletion of a note', () => {
   })
 })
 
-describe('update of a note', () => {
-  test.only('return updated object as json', async () => {
+describe('update of a blog', () => {
+  test('return updated object as json', async () => {
     const blogToUpdate = initialBlogs[0]
     blogToUpdate.likes = 2077
 
     const response = await api
       .put(`/api/blogs/${blogToUpdate._id}`)
+      .set('Authorization', `Bearer ${process.env.TOKEN}`)
       .send(blogToUpdate)
 
-    const blogAfterUpdate = await api.get('/api/blogs/' + response.body.id)
+    const blogAfterUpdate = await api
+      .get('/api/blogs/' + response.body.id)
+      .set('Authorization', `Bearer ${process.env.TOKEN}`)
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
 
     expect(blogAfterUpdate.body.likes).toBe(2077)
   })
