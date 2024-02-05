@@ -13,8 +13,13 @@ const App = () => {
   const [user, setUser] = useState(null)
 
   useEffect(() => {
-    console.log(user)
-    blogService.getAll().then((initialBlogs) => setBlogs(initialBlogs))
+    const loggedUserJSON = window.localStorage.getItem('loggedBlogAppUser')
+    if (loggedUserJSON) {
+      const user = JSON.parse(loggedUserJSON)
+      setUser(user)
+      blogService.setToken(user.token)
+      blogService.getAll().then((initialBlogs) => setBlogs(initialBlogs))
+    }
   }, [])
 
   const handleLogin = async (event) => {
@@ -24,15 +29,38 @@ const App = () => {
         username,
         password,
       })
-      setUser(user)
       setUsername('')
       setPassword('')
+      window.localStorage.setItem('loggedBlogAppUser', JSON.stringify(user))
+      window.location.reload()
     } catch (exception) {
       setErrorMessage('Wrong credentials')
       setTimeout(() => {
         setErrorMessage(null)
       }, 5000)
     }
+  }
+
+  const handleLogout = () => {
+    window.localStorage.removeItem('loggedBlogAppUser')
+    window.location.reload()
+  }
+
+  const handleBlogChange = (event) => {
+    setNewBlog(event.target.value)
+  }
+
+  const addBlog = (event) => {
+    event.preventDefault()
+    // const blogObject = {
+    //   content: newNote,
+    //   important: Math.random() > 0.5,
+    // }
+
+    // noteService.create(blogObject).then((returnedNote) => {
+    //   setNotes(notes.concat(returnedNote))
+    //   setNewNote('')
+    // })
   }
 
   const loginForm = () => (
@@ -60,28 +88,22 @@ const App = () => {
   )
 
   const blogForm = () => (
-    <form onSubmit={addBlog}>
-      <input value={newBlog} onChange={handleBlogChange} />
-      <button type="submit">save</button>
-    </form>
+    <div>
+      <h2>create new</h2>
+      <form onSubmit={addBlog}>
+        <div>
+          title: <input value={newBlog} onChange={handleBlogChange} />
+        </div>
+        <div>
+          author: <input value={newBlog} onChange={handleBlogChange} />
+        </div>
+        <div>
+          url: <input value={newBlog} onChange={handleBlogChange} />
+        </div>
+        <button type="submit">create</button>
+      </form>
+    </div>
   )
-
-  const handleBlogChange = (event) => {
-    setNewBlog(event.target.value)
-  }
-
-  const addBlog = (event) => {
-    event.preventDefault()
-    // const blogObject = {
-    //   content: newNote,
-    //   important: Math.random() > 0.5,
-    // }
-
-    // noteService.create(blogObject).then((returnedNote) => {
-    //   setNotes(notes.concat(returnedNote))
-    //   setNewNote('')
-    // })
-  }
 
   return (
     <div>
@@ -90,7 +112,9 @@ const App = () => {
       {!user && loginForm()}
       {user && (
         <div>
-          <p>{user.name} logged in</p>
+          <p>
+            {user.name} logged in <button onClick={handleLogout}>logout</button>
+          </p>
           <h2>blogs</h2>
           <ul>
             {blogs.map((blog, i) => (
