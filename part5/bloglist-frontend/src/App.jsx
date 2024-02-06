@@ -1,7 +1,9 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Blog from './components/Blog'
 import Notification from './components/Notification'
 import ErrorNotification from './components/ErrorNotification'
+import Togglable from './components/Togglable'
+import BlogForm from './components/BlogForm'
 import blogService from './services/blogs'
 import loginService from './services/login'
 
@@ -15,6 +17,7 @@ const App = () => {
   const [newUrl, setNewUrl] = useState('')
   const [addedMessage, setAddedMessage] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
+  const blogFormRef = useRef()
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedBlogAppUser')
@@ -69,18 +72,30 @@ const App = () => {
       author: newAuthor,
       url: newUrl,
     }
-
-    const createdBlog = await blogService.create(blogObject)
-    setBlogs(blogs.concat(createdBlog))
-    setNewTitle('')
-    setNewAuthor('')
-    setNewUrl('')
-    setAddedMessage(
-      'a new blog ' + createdBlog.title + ' by ' + createdBlog.author + ' added'
-    )
-    setTimeout(() => {
-      setAddedMessage(null)
-    }, 5000)
+    try {
+      const createdBlog = await blogService.create(blogObject)
+      setBlogs(blogs.concat(createdBlog))
+      setNewTitle('')
+      setNewAuthor('')
+      setNewUrl('')
+      blogFormRef.current.toggleVisibility()
+      setAddedMessage(
+        'a new blog ' +
+          createdBlog.title +
+          ' by ' +
+          createdBlog.author +
+          ' added'
+      )
+      setTimeout(() => {
+        setAddedMessage(null)
+      }, 5000)
+    } catch (exception) {
+      console.log(exception)
+      setErrorMessage(exception.response.data.error)
+      setTimeout(() => {
+        setErrorMessage(null)
+      }, 5000)
+    }
   }
 
   const loginForm = () => (
@@ -113,18 +128,18 @@ const App = () => {
   const blogForm = () => (
     <div>
       <h2>create new</h2>
-      <form onSubmit={addBlog}>
-        <div>
-          title: <input value={newTitle} onChange={handleTitleChange} />
-        </div>
-        <div>
-          author: <input value={newAuthor} onChange={handleAuthorChange} />
-        </div>
-        <div>
-          url: <input value={newUrl} onChange={handleUrlChange} />
-        </div>
-        <button type="submit">create</button>
-      </form>
+      <Togglable buttonLabel="add new" ref={blogFormRef}>
+        <BlogForm
+          addBlog={addBlog}
+          newTitle={newTitle}
+          newAuthor={newAuthor}
+          newUrl={newUrl}
+          handleTitleChange={handleTitleChange}
+          handleAuthorChange={handleAuthorChange}
+          handleUrlChange={handleUrlChange}
+        />
+      </Togglable>
+      <ErrorNotification error={errorMessage} />
     </div>
   )
 
@@ -146,7 +161,6 @@ const App = () => {
           {blogForm()}
         </div>
       )}
-      {/* <Footer /> */}
     </div>
   )
 }
