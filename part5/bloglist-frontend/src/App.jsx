@@ -12,9 +12,6 @@ const App = () => {
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
   const [blogs, setBlogs] = useState([])
-  const [newTitle, setNewTitle] = useState('')
-  const [newAuthor, setNewAuthor] = useState('')
-  const [newUrl, setNewUrl] = useState('')
   const [addedMessage, setAddedMessage] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
   const blogFormRef = useRef()
@@ -53,31 +50,10 @@ const App = () => {
     window.location.reload()
   }
 
-  const handleTitleChange = (event) => {
-    setNewTitle(event.target.value)
-  }
-
-  const handleAuthorChange = (event) => {
-    setNewAuthor(event.target.value)
-  }
-
-  const handleUrlChange = (event) => {
-    setNewUrl(event.target.value)
-  }
-
-  const addBlog = async (event) => {
-    event.preventDefault()
-    const blogObject = {
-      title: newTitle,
-      author: newAuthor,
-      url: newUrl,
-    }
+  const addBlog = async (blogObject) => {
     try {
       const createdBlog = await blogService.create(blogObject)
       setBlogs(blogs.concat(createdBlog))
-      setNewTitle('')
-      setNewAuthor('')
-      setNewUrl('')
       blogFormRef.current.toggleVisibility()
       setAddedMessage(
         'a new blog ' +
@@ -90,7 +66,6 @@ const App = () => {
         setAddedMessage(null)
       }, 5000)
     } catch (exception) {
-      console.log(exception)
       setErrorMessage(exception.response.data.error)
       setTimeout(() => {
         setErrorMessage(null)
@@ -127,17 +102,9 @@ const App = () => {
 
   const blogForm = () => (
     <div>
-      <h2>create new</h2>
       <Togglable buttonLabel="add new" ref={blogFormRef}>
-        <BlogForm
-          addBlog={addBlog}
-          newTitle={newTitle}
-          newAuthor={newAuthor}
-          newUrl={newUrl}
-          handleTitleChange={handleTitleChange}
-          handleAuthorChange={handleAuthorChange}
-          handleUrlChange={handleUrlChange}
-        />
+        <h2>create new</h2>
+        <BlogForm createBlog={addBlog} />
       </Togglable>
       <ErrorNotification error={errorMessage} />
     </div>
