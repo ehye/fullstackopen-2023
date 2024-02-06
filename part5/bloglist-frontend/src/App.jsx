@@ -4,13 +4,13 @@ import blogService from './services/blogs'
 import loginService from './services/login'
 
 const App = () => {
-  const [blogs, setBlogs] = useState([])
-  const [newBlog, setNewBlog] = useState('')
-  // const [showAll, setShowAll] = useState(true)
-  // const [errorMessage, setErrorMessage] = useState(null)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
+  const [blogs, setBlogs] = useState([])
+  const [newTitle, setNewTitle] = useState('')
+  const [newAuthor, setNewAuthor] = useState('')
+  const [newUrl, setNewUrl] = useState('')
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedBlogAppUser')
@@ -46,21 +46,31 @@ const App = () => {
     window.location.reload()
   }
 
-  const handleBlogChange = (event) => {
-    setNewBlog(event.target.value)
+  const handleTitleChange = (event) => {
+    setNewTitle(event.target.value)
   }
 
-  const addBlog = (event) => {
-    event.preventDefault()
-    // const blogObject = {
-    //   content: newNote,
-    //   important: Math.random() > 0.5,
-    // }
+  const handleAuthorChange = (event) => {
+    setNewAuthor(event.target.value)
+  }
 
-    // noteService.create(blogObject).then((returnedNote) => {
-    //   setNotes(notes.concat(returnedNote))
-    //   setNewNote('')
-    // })
+  const handleUrlChange = (event) => {
+    setNewUrl(event.target.value)
+  }
+
+  const addBlog = async (event) => {
+    event.preventDefault()
+    const blogObject = {
+      title: newTitle,
+      author: newAuthor,
+      url: newUrl,
+    }
+
+    const createdBlog = await blogService.create(blogObject)
+    setBlogs(blogs.concat(createdBlog))
+    setNewTitle('')
+    setNewAuthor('')
+    setNewUrl('')
   }
 
   const loginForm = () => (
@@ -92,13 +102,13 @@ const App = () => {
       <h2>create new</h2>
       <form onSubmit={addBlog}>
         <div>
-          title: <input value={newBlog} onChange={handleBlogChange} />
+          title: <input value={newTitle} onChange={handleTitleChange} />
         </div>
         <div>
-          author: <input value={newBlog} onChange={handleBlogChange} />
+          author: <input value={newAuthor} onChange={handleAuthorChange} />
         </div>
         <div>
-          url: <input value={newBlog} onChange={handleBlogChange} />
+          url: <input value={newUrl} onChange={handleUrlChange} />
         </div>
         <button type="submit">create</button>
       </form>
