@@ -47,7 +47,7 @@ const Blog = ({ blog, user }) => {
   }
 
   return (
-    <div style={blogStyle}>
+    <div className='blog' style={blogStyle}>
       {blog.title}
       <Togglable buttonLabel="view" toggleButtonLabel="hide" ref={viewFormRef}>
         <ul>
@@ -64,7 +64,7 @@ const Blog = ({ blog, user }) => {
           </div>
           <div>{blog.author}</div>
         </ul>
-        {user.id === blog.user.id && removeButton(blog, user.token)}
+        {user && user.id === blog.user.id && removeButton(blog, user.token)}
       </Togglable>
     </div>
   )
