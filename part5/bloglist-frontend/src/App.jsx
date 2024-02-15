@@ -114,6 +114,10 @@ const App = () => {
     </div>
   )
 
+  const compareLikes = (a, b) => {
+    return b.likes - a.likes
+  }
+
   return (
     <div>
       {!user && loginForm()}
@@ -125,7 +129,7 @@ const App = () => {
           <h2>blogs</h2>
           <Notification message={addedMessage} />
           <ul>
-            {blogs.map((blog, i) => (
+            {blogs.sort(compareLikes).map((blog, i) => (
               <Blog key={i} blog={blog} token={user.token} />
             ))}
           </ul>
