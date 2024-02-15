@@ -44,7 +44,7 @@ blogsRouter.put('/:id', async (request, response) => {
     name: 1,
     id: 1,
   })
-  if (blog.user.toString() === request.user.id) {
+  if (blog.user.id.toString() === request.body.user) {
     blog = {
       title: request.body.title,
       author: request.body.author,
