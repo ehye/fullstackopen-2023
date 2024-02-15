@@ -130,7 +130,7 @@ const App = () => {
           <Notification message={addedMessage} />
           <ul>
             {blogs.sort(compareLikes).map((blog, i) => (
-              <Blog key={i} blog={blog} token={user.token} />
+              <Blog key={i} blog={blog} user={user} />
             ))}
           </ul>
           {addBlogForm()}

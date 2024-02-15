@@ -11,11 +11,31 @@ const updateLikes = async (blogObject, token) => {
     likes: blogObject.likes + 1,
   }
   blogService.setToken(token)
-  const response = await blogService.update(blogObject.id, updatedBlog)
-  return response
+  await blogService.update(blogObject.id, updatedBlog)
 }
 
-const Blog = ({ blog, token }) => {
+const removeBlog = async (blogObject, token) => {
+  if (
+    window.confirm(`Remove blog ${blogObject.title} by ${blogObject.author}`)
+  ) {
+    blogService.setToken(token)
+    await blogService.remove(blogObject.id)
+  }
+}
+
+const removeButton = (blog, token) => {
+  return (
+    <button
+      onClick={() => {
+        removeBlog(blog, token)
+      }}
+    >
+      remove
+    </button>
+  )
+}
+
+const Blog = ({ blog, user }) => {
   const viewFormRef = useRef()
 
   const blogStyle = {
@@ -36,7 +56,7 @@ const Blog = ({ blog, token }) => {
             likes {blog.likes}{' '}
             <button
               onClick={async () => {
-                updateLikes(blog, token)
+                updateLikes(blog, user.token)
               }}
             >
               like
@@ -44,6 +64,7 @@ const Blog = ({ blog, token }) => {
           </div>
           <div>{blog.author}</div>
         </ul>
+        {user.id === blog.user.id && removeButton(blog, user.token)}
       </Togglable>
     </div>
   )
