@@ -13,7 +13,7 @@ module.exports = {
   plugins: ['react-refresh', 'jest'],
   rules: {
     indent: ['error', 2],
-    quotes: ['error', 'single'],
+    quotes: ['error', 'single', { avoidEscape: true }],
     semi: ['error', 'never'],
     eqeqeq: 'error',
     'arrow-spacing': ['error', { before: true, after: true }],
