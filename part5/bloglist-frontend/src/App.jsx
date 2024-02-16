@@ -46,6 +46,7 @@ const App = () => {
       }, 5000)
     }
   }
+
   const loginForm = () => (
     <LoginForm
       username={username}
@@ -96,7 +97,8 @@ const App = () => {
       url: blogObject.url,
       likes: blogObject.likes + 1,
     }
-    await blogService.update(blogObject.id, updatedBlog)
+    const res = await blogService.update(blogObject.id, updatedBlog)
+    return res
   }
 
   const removeBlogOf = async (blogObject) => {

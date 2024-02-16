@@ -36,22 +36,27 @@ describe('Blog app', function () {
     })
   })
 
-  describe('When logged in', function () {
+  describe.only('When logged in', function () {
     beforeEach(function () {
-      cy.get('input:first').type('mluukkai')
-      cy.get('input:last').type('salainen')
-      cy.get('#login-button').click()
+      cy.login({ username: 'mluukkai', password: 'salainen' })
     })
 
-    it.only('A blog can be created', function () {
-      cy.get('#btn-show').click()
-      cy.get('#input-title').type('title')
-      cy.get('#input-author').type('author')
-      cy.get('#input-url').type('url')
-      cy.get('#button-createBlog').click()
+    it('A blog can be created', function () {
+      cy.createBlog({ title: 'title', author: 'author', url: 'url' })
+
       cy.get('.blog').within(() => {
         cy.contains('title')
         cy.contains('view')
+      })
+    })
+
+    it('Users can like a blog', function () {
+      cy.createBlog({ title: 'title', author: 'author', url: 'url' })
+
+      cy.get('.blog').within(() => {
+        cy.get('#btn-show').click()
+        cy.get('#btn-likes').click()
+        cy.contains('likes 1')
       })
     })
   })

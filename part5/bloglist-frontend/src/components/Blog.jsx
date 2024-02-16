@@ -1,11 +1,17 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useRef } from 'react'
 import Togglable from './Togglable'
-import blogService from '../services/blogs'
 
 const removeButton = (removeBlog) => <button onClick={removeBlog}>remove</button>
 
 const Blog = ({ blog, updateLikes, removeBlog, isRemovable }) => {
   const viewFormRef = useRef()
+  const [likes, setLikes] = useState(blog.likes)
+
+  const handleLikes = async () => {
+    const res = await updateLikes()
+    blog.likes = res.likes
+    setLikes(res.likes)
+  }
 
   const blogStyle = {
     paddingTop: 10,
@@ -22,8 +28,8 @@ const Blog = ({ blog, updateLikes, removeBlog, isRemovable }) => {
         <ul>
           <div>{blog.url}</div>
           <div>
-            likes {blog.likes}{' '}
-            <button id="btn-likes" onClick={updateLikes}>
+            likes {likes}
+            <button id="btn-likes" onClick={handleLikes}>
               like
             </button>
           </div>
