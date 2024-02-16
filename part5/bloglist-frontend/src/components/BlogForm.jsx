@@ -33,13 +33,13 @@ const BlogForm = ({ createBlog }) => {
   return (
     <form onSubmit={addBlog}>
       <div>
-        title: <input value={newTitle} onChange={handleTitleChange} />
+        title: <input id="input-title" value={newTitle} onChange={handleTitleChange} />
       </div>
       <div>
-        author: <input value={newAuthor} onChange={handleAuthorChange} />
+        author: <input id="input-author" value={newAuthor} onChange={handleAuthorChange} />
       </div>
       <div>
-        url: <input value={newUrl} onChange={handleUrlChange} />
+        url: <input id="input-url" value={newUrl} onChange={handleUrlChange} />
       </div>
       <button type="submit">create</button>
     </form>
