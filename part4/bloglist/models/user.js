@@ -13,6 +13,10 @@ const userSchema = new mongoose.Schema({
     minLength: 3,
     required: true,
   },
+  name: {
+    type: String,
+    minLength: 3,
+  },
   blogs: [
     {
       type: mongoose.Schema.Types.ObjectId,

@@ -3,7 +3,7 @@ const Notification = ({ message }) => {
     return null
   }
 
-  return <h1>{message}</h1>
+  return <h2>{message}</h2>
 }
 
 export default Notification

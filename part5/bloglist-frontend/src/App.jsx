@@ -7,6 +7,7 @@ import BlogForm from './components/BlogForm'
 import LoginForm from './components/LoginForm'
 import blogService from './services/blogs'
 import loginService from './services/login'
+import './index.css'
 
 const App = () => {
   const [username, setUsername] = useState('')
@@ -116,7 +117,7 @@ const App = () => {
       {user && (
         <div>
           <p>
-            {user.username} logged in <button onClick={handleLogout}>logout</button>
+            {user.name} logged in <button onClick={handleLogout}>logout</button>
           </p>
           <Notification message={addedMessage} />
           <ul>
