@@ -45,35 +45,6 @@ const App = () => {
       }, 5000)
     }
   }
-
-  const handleLogout = () => {
-    window.localStorage.removeItem('loggedBlogAppUser')
-    window.location.reload()
-  }
-
-  const addBlog = async (blogObject) => {
-    try {
-      const createdBlog = await blogService.create(blogObject)
-      setBlogs(blogs.concat(createdBlog))
-      blogFormRef.current.toggleVisibility()
-      setAddedMessage(
-        'a new blog ' +
-          createdBlog.title +
-          ' by ' +
-          createdBlog.author +
-          ' added'
-      )
-      setTimeout(() => {
-        setAddedMessage(null)
-      }, 5000)
-    } catch (exception) {
-      setErrorMessage(exception.response.data.error)
-      setTimeout(() => {
-        setErrorMessage(null)
-      }, 5000)
-    }
-  }
-
   const loginForm = () => (
     <LoginForm
       username={username}
@@ -86,17 +57,52 @@ const App = () => {
 
   const addBlogForm = () => (
     <div>
-      <Togglable
-        buttonLabel="add new"
-        toggleButtonLabel="cancel"
-        ref={blogFormRef}
-      >
+      <Togglable buttonLabel="add new" toggleButtonLabel="cancel" ref={blogFormRef}>
         <h2>create new</h2>
         <BlogForm createBlog={addBlog} />
       </Togglable>
       <ErrorNotification error={errorMessage} />
     </div>
   )
+
+  const handleLogout = () => {
+    window.localStorage.removeItem('loggedBlogAppUser')
+    window.location.reload()
+  }
+
+  const addBlog = async (blogObject) => {
+    try {
+      const createdBlog = await blogService.create(blogObject)
+      setBlogs(blogs.concat(createdBlog))
+      blogFormRef.current.toggleVisibility()
+      setAddedMessage('a new blog ' + createdBlog.title + ' by ' + createdBlog.author + ' added')
+      setTimeout(() => {
+        setAddedMessage(null)
+      }, 5000)
+    } catch (exception) {
+      setErrorMessage(exception.response.data.error)
+      setTimeout(() => {
+        setErrorMessage(null)
+      }, 5000)
+    }
+  }
+
+  const updateLikesOf = async (blogObject) => {
+    const updatedBlog = {
+      user: blogObject.user.id,
+      author: blogObject.author,
+      title: blogObject.title,
+      url: blogObject.url,
+      likes: blogObject.likes + 1,
+    }
+    await blogService.update(blogObject.id, updatedBlog)
+  }
+
+  const removeBlogOf = async (blogObject) => {
+    if (window.confirm(`Remove blog ${blogObject.title} by ${blogObject.author}`)) {
+      await blogService.remove(blogObject.id)
+    }
+  }
 
   const compareLikes = (a, b) => {
     return b.likes - a.likes
@@ -109,14 +115,19 @@ const App = () => {
       {user && (
         <div>
           <p>
-            {user.username} logged in{' '}
-            <button onClick={handleLogout}>logout</button>
+            {user.username} logged in <button onClick={handleLogout}>logout</button>
           </p>
           <h2>blogs</h2>
           <Notification message={addedMessage} />
           <ul>
             {blogs.sort(compareLikes).map((blog, i) => (
-              <Blog key={i} blog={blog} user={user} />
+              <Blog
+                key={i}
+                blog={blog}
+                updateLikes={() => updateLikesOf(blog)}
+                removeBlog={() => removeBlogOf(blog)}
+                isRemovable={user.id === blog.user.id}
+              />
             ))}
           </ul>
           {addBlogForm()}
