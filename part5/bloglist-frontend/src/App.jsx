@@ -111,13 +111,13 @@ const App = () => {
   return (
     <div>
       <ErrorNotification error={errorMessage} />
+      <h2>blogs</h2>
       {!user && loginForm()}
       {user && (
         <div>
           <p>
             {user.username} logged in <button onClick={handleLogout}>logout</button>
           </p>
-          <h2>blogs</h2>
           <Notification message={addedMessage} />
           <ul>
             {blogs.sort(compareLikes).map((blog, i) => (
