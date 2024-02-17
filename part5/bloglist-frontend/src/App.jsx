@@ -69,7 +69,7 @@ const App = () => {
 
   const handleLogout = () => {
     window.localStorage.removeItem('loggedBlogAppUser')
-    window.location.reload()
+    setUser(null)
   }
 
   const addBlog = async (blogObject) => {
@@ -121,7 +121,10 @@ const App = () => {
       {user && (
         <div>
           <p>
-            {user.name} logged in <button onClick={handleLogout}>logout</button>
+            {user.name} logged in{' '}
+            <button id="button-logout" onClick={handleLogout}>
+              logout
+            </button>
           </p>
           <Notification message={addedMessage} />
           <ul>

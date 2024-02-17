@@ -6,6 +6,11 @@ describe('Blog app', function () {
       name: 'Matti Luukkainen',
       password: 'salainen',
     })
+    cy.request('POST', 'http://localhost:3001/api/users', {
+      username: 'root',
+      name: 'admin',
+      password: 'root',
+    })
     cy.visit('http://localhost:5173')
   })
 
@@ -36,7 +41,7 @@ describe('Blog app', function () {
     })
   })
 
-  describe.only('When logged in', function () {
+  describe('When logged in', function () {
     beforeEach(function () {
       cy.login({ username: 'mluukkai', password: 'salainen' })
     })
@@ -60,13 +65,23 @@ describe('Blog app', function () {
       })
     })
 
-    it.only('User who created a blog can delete it', function () {
+    it('User who created a blog can delete it', function () {
       cy.createBlog({ title: 'title', author: 'author', url: 'url' })
       cy.get('.blog').within(() => {
         cy.get('#btn-show').click()
       })
       cy.get('#button-remove').click()
       cy.get('.blog').should('not.exist')
+    })
+
+    it('Only the creator can see the delete button', function () {
+      cy.createBlog({ title: 'title', author: 'author', url: 'url' })
+      cy.get('#button-logout').click()
+      cy.login({ username: 'root', password: 'root' })
+      cy.get('.blog').within(() => {
+        cy.get('#btn-show').click()
+        cy.get('#button-remove').should('not.exist')
+      })
     })
   })
 })
