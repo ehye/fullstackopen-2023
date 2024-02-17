@@ -41,7 +41,7 @@ describe('Blog app', function () {
     })
   })
 
-  describe('When logged in', function () {
+  describe.only('When logged in', function () {
     beforeEach(function () {
       cy.login({ username: 'mluukkai', password: 'salainen' })
     })
@@ -82,6 +82,18 @@ describe('Blog app', function () {
         cy.get('#btn-show').click()
         cy.get('#button-remove').should('not.exist')
       })
+    })
+
+    it('Blogs are ordered with the most likes being first', function () {
+      cy.createBlog({ title: 'The title with the most likes', author: 'author0', url: 'url0' })
+      cy.get('.blog').within(() => {
+        cy.get('#btn-show').click()
+        cy.get('#btn-likes').click()
+      })
+      cy.createBlog({ title: 'The title with the second most likes', author: 'author1', url: 'url1' })
+
+      cy.get('.blog').eq(0).should('contain', 'The title with the most likes')
+      cy.get('.blog').eq(1).should('contain', 'The title with the second most likes')
     })
   })
 })
