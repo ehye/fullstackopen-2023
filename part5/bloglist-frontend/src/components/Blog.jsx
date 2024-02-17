@@ -1,7 +1,11 @@
 import { useState, useRef } from 'react'
 import Togglable from './Togglable'
 
-const removeButton = (removeBlog) => <button onClick={removeBlog}>remove</button>
+const removeButton = (removeBlog) => (
+  <button id="button-remove" onClick={removeBlog}>
+    remove
+  </button>
+)
 
 const Blog = ({ blog, updateLikes, removeBlog, isRemovable }) => {
   const viewFormRef = useRef()
