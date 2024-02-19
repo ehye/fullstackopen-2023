@@ -1,6 +1,7 @@
 const blogsRouter = require('express').Router()
 const Blog = require('../models/blog')
-const User = require('../models/user')
+// const User = require('../models/user')
+const { userExtractor } = require('../utils/middleware')
 
 blogsRouter.get('/', async (request, response) => {
   const blogs = await Blog.find({}).populate('user', {
@@ -20,9 +21,9 @@ blogsRouter.get('/:id', async (request, response) => {
   }
 })
 
-blogsRouter.post('/', async (request, response) => {
+blogsRouter.post('/', userExtractor, async (request, response) => {
   const body = request.body
-  const user = await User.findById(request.user.id)
+  const user = request.user
 
   const blog = new Blog({
     title: body.title,
@@ -60,15 +61,21 @@ blogsRouter.put('/:id', async (request, response) => {
   }
 })
 
-blogsRouter.delete('/:id', async (request, response) => {
+blogsRouter.delete('/:id', userExtractor, async (request, response) => {
   var blog = await Blog.findById(request.params.id)
 
-  if (blog.user.toString() === request.user.id) {
-    await Blog.findByIdAndDelete(request.params.id)
-    response.status(204).end()
-  } else {
-    return response.status(401).json({ error: 'user invalid' })
+  const user = request.user
+
+  if (!user || blog.user._id.toString() !== user.id.toString()) {
+    return response.status(401).json({ error: 'operation not permitted' })
   }
+
+  user.blogs = user.blogs.filter((b) => b.toString() !== blog.id.toString())
+
+  await user.save()
+  await blog.remove()
+
+  response.status(204).end()
 })
 
 module.exports = blogsRouter

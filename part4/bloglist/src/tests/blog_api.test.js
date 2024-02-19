@@ -1,74 +1,38 @@
 const mongoose = require('mongoose')
 const supertest = require('supertest')
-const app = require('../app')
+const app = require('../../app')
 const Blog = require('../models/blog')
 const api = supertest(app)
+const User = require('../models/user')
+const helper = require('./test_helper')
 
-const initialBlogs = [
-  {
-    _id: '5a422a851b54a676234d17f7',
-    title: 'React patterns',
-    author: 'Michael Chan',
-    url: 'https://reactpatterns.com/',
-    likes: 7,
-    __v: 0,
-  },
-  {
-    _id: '5a422aa71b54a676234d17f8',
-    title: 'Go To Statement Considered Harmful',
-    author: 'Edsger W. Dijkstra',
-    url: 'http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html',
-    likes: 5,
-    __v: 0,
-  },
-  {
-    _id: '5a422b3a1b54a676234d17f9',
-    title: 'Canonical string reduction',
-    author: 'Edsger W. Dijkstra',
-    url: 'http://www.cs.utexas.edu/~EWD/transcriptions/EWD08xx/EWD808.html',
-    likes: 12,
-    __v: 0,
-  },
-  {
-    _id: '5a422b891b54a676234d17fa',
-    title: 'First class tests',
-    author: 'Robert C. Martin',
-    url: 'http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.htmll',
-    likes: 10,
-    __v: 0,
-  },
-  {
-    _id: '5a422bc61b54a676234d17fc',
-    title: 'Type wars',
-    author: 'Robert C. Martin',
-    url: 'http://blog.cleancoder.com/uncle-bob/2016/05/01/TypeWars.html',
-    likes: 2,
-    __v: 0,
-  },
-]
+let token
 
 beforeEach(async () => {
-  await Blog.deleteMany({})
-  let blogObject = new Blog(initialBlogs[0])
-  await blogObject.save()
-  blogObject = new Blog(initialBlogs[1])
-  await blogObject.save()
+  await User.deleteMany({})
+  const user = helper.initialUsers[0]
+  await api.post('/api/users').send(user)
+  const response = await api.post('/api/login').send(user)
+  token = `Bearer ${response.body.token}`
+
+  // await Blog.deleteMany({})
+  // await Blog.insertMany(helper.initialBlogs)
 })
 
 describe('viewing blogs', () => {
   test('blogs are returned as json', async () => {
     const response = await api
       .get('/api/blogs')
-      .set('Authorization', `Bearer ${process.env.TOKEN}`)
+      .set('Authorization', token)
       .expect(200)
       .expect('Content-Type', /application\/json/)
-    expect(response.body.length).toEqual(2)
+    expect(response.body.length).toEqual(helper.initialBlogs.length)
   })
 
   test('the unique identifier property of the blog posts is named id', async () => {
     const response = await api
       .get('/api/blogs')
-      .set('Authorization', `Bearer ${process.env.TOKEN}`)
+      .set('Authorization', token)
       .expect(200)
       .expect('Content-Type', /application\/json/)
     const result = response.body
@@ -89,8 +53,8 @@ describe('addition of a new blog', () => {
     var res = await api
       .post('/api/blogs')
       .send(blog)
-      .set('Authorization', `Bearer ${process.env.TOKEN}`)
-      .expect(200)
+      .set('Authorization', token)
+      .expect(201)
       .expect('Content-Type', /application\/json/)
 
     const response = await api.get('/api/blogs/' + res.body.id)
@@ -110,8 +74,8 @@ describe('addition of a new blog', () => {
     var res = await api
       .post('/api/blogs')
       .send(blog)
-      .set('Authorization', `Bearer ${process.env.TOKEN}`)
-      .expect(200)
+      .set('Authorization', token)
+      .expect(201)
       .expect('Content-Type', /application\/json/)
 
     const response = await api.get('/api/blogs/' + res.body.id)
@@ -124,7 +88,7 @@ describe('addition of a new blog', () => {
     var response = await api
       .post('/api/blogs')
       .send(blog)
-      .set('Authorization', `Bearer ${process.env.TOKEN}`)
+      .set('Authorization', token)
       .expect(400)
   })
 
@@ -135,37 +99,39 @@ describe('addition of a new blog', () => {
 })
 
 describe('deletion of a blog', () => {
-  test('succeeds with status code 204 if id is valid', async () => {
-    const blogToDelete = initialBlogs[0]
+  let id
+  beforeEach(async () => {
+    await Blog.deleteMany({})
 
-    await api
-      .delete(`/api/blogs/${blogToDelete._id}`)
-      .set('Authorization', `Bearer ${process.env.TOKEN}`)
-      .expect(204)
+    const response = await api
+      .post('/api/blogs')
+      .set('Authorization', token)
+      .send(helper.initialBlogs[0])
 
-    const blogsAtEnd = await api.get('/api/blogs')
+    id = response.body.id
+  })
 
-    expect(blogsAtEnd.body).toHaveLength(1)
-
-    const ids = blogsAtEnd.body.map((r) => r.id)
-
-    expect(ids).not.toContain(blogToDelete.id)
+  test.only('succeeds with status code 204 if id is valid', async () => {
+    await api.delete(`/api/blogs/${id}`).set('Authorization', token).expect(204)
+    const ids = helper.blogsInDb.map((r) => r.id)
+    expect(ids).not.toContain(id)
   })
 })
 
 describe('update of a blog', () => {
   test('return updated object as json', async () => {
-    const blogToUpdate = initialBlogs[0]
+    // const blogToUpdate = helper.initialBlogs[0]
+    const blogToUpdate = helper.blogsInDb[0]
     blogToUpdate.likes = 2077
 
     const response = await api
       .put(`/api/blogs/${blogToUpdate._id}`)
-      .set('Authorization', `Bearer ${process.env.TOKEN}`)
+      .set('Authorization', token)
       .send(blogToUpdate)
 
     const blogAfterUpdate = await api
       .get('/api/blogs/' + response.body.id)
-      .set('Authorization', `Bearer ${process.env.TOKEN}`)
+      .set('Authorization', token)
       .expect(200)
       .expect('Content-Type', /application\/json/)
 

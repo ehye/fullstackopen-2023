@@ -15,7 +15,7 @@ usersRouter.get('/', async (request, response) => {
 usersRouter.get('/:id', async (request, response) => {
   var user = await User.findById(request.params.id)
   if (user) {
-    response.json(user).json()
+    response.json(user)
   } else {
     response.status(404).end()
   }
