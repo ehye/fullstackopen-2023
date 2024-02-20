@@ -18,10 +18,14 @@ const App = () => {
     }
   }
 
+  const compareVotes = (a, b) => {
+    return b.votes - a.votes
+  }
+
   return (
     <div>
       <h2>Anecdotes</h2>
-      {anecdotes.map((anecdote) => (
+      {anecdotes.sort(compareVotes).map((anecdote) => (
         <div key={anecdote.id}>
           <div>{anecdote.content}</div>
           <div>
