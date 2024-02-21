@@ -4,11 +4,10 @@ import Filter from '../components/Filter'
 
 const AnecdoteList = () => {
   const anecdotes = useSelector(({ filter, anecdotes }) => {
-    console.log(filter)
     if (filter === '') {
-      return anecdotes
+      return [...anecdotes]
     } else {
-      return anecdotes.filter((a) => a.content.match(filter))
+      return [...anecdotes].filter((a) => a.content.match(filter))
     }
   })
   const dispatch = useDispatch()
@@ -27,9 +26,7 @@ const AnecdoteList = () => {
           <div>{anecdote.content}</div>
           <div>
             has {anecdote.votes}
-            <button id={anecdote.id} onClick={() => vote(anecdote.id)}>
-              vote
-            </button>
+            <button onClick={() => vote(anecdote.id)}>vote</button>
           </div>
         </div>
       ))}
