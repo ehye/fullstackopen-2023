@@ -5,6 +5,8 @@ const notificationReducer = (state, action) => {
   switch (action.type) {
     case 'CREATE':
       return <div>anecdote `{action.anecdote.content}` created</div>
+    case 'TOO_SHORT':
+      return <div>too short anecdote, must have length 5 or more</div>
     case 'VOTE':
       return <div>anecdote `{action.anecdote.content}` voted</div>
     case 'EMPTY':

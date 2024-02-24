@@ -24,10 +24,13 @@ const AnecdoteForm = () => {
       votes: 0,
     }
 
-    newAnecdoteMutation.mutate(newAnecdote)
-
+    if (newAnecdote.content.length < 5) {
+      dispatch({ type: 'TOO_SHORT' })
+    } else {
+      newAnecdoteMutation.mutate(newAnecdote)
+      dispatch({ type: 'CREATE', anecdote: newAnecdote })
+    }
     event.target.anecdote.value = ''
-    dispatch({ type: 'CREATE', anecdote: newAnecdote })
     setTimeout(() => {
       dispatch({ type: 'EMPTY' })
     }, 5 * 1000)

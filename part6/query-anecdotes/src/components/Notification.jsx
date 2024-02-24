@@ -9,9 +9,10 @@ const Notification = () => {
   }
 
   const notification = useNotificationValue()
-  console.log(notification)
-  if (notification !== '') return <div style={style}>{notification}</div>
-  else return null
+  if (notification !== '')
+    return <div style={style}>{notification}</div>
+  else
+    return null
 }
 
 export default Notification
