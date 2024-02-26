@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import { BrowserRouter as Router, Routes, Route, Link, useParams } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, Link, useParams, useNavigate } from 'react-router-dom'
 
-const Menu = ({ anecdotes }) => {
+const Menu = ({ anecdotes, addNew, notification }) => {
   const padding = {
     paddingRight: 5,
   }
@@ -20,18 +20,30 @@ const Menu = ({ anecdotes }) => {
         </Link>
       </div>
 
+      <Notification anecdote={notification} />
+
       <Routes>
         <Route path="/anecdotes" element={<AnecdoteList anecdotes={anecdotes} />} />
         <Route path="/anecdotes/:id" element={<Anecdote anecdotes={anecdotes} />} />
-        <Route path="/create" element={<CreateNew />} />
+        <Route path="/create" element={<CreateNew addNew={addNew} />} />
         <Route path="/about" element={<About />} />
       </Routes>
-
-      <div>
-        <i>Note app, Department of Computer Science 2023</i>
-      </div>
     </Router>
   )
+}
+
+const Notification = ({ anecdote }) => {
+  const style = {
+    border: 'solid',
+    padding: 10,
+    borderWidth: 1,
+  }
+
+  if (anecdote === '') {
+    return
+  } else {
+    return <div style={style}>a new anecdote {anecdote.content} created!</div>
+  }
 }
 
 const AnecdoteList = ({ anecdotes }) => (
@@ -84,6 +96,7 @@ const CreateNew = (props) => {
   const [content, setContent] = useState('')
   const [author, setAuthor] = useState('')
   const [info, setInfo] = useState('')
+  const navigate = useNavigate()
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -93,6 +106,7 @@ const CreateNew = (props) => {
       info,
       votes: 0,
     })
+    navigate('/anecdotes')
   }
 
   return (
@@ -140,6 +154,10 @@ const App = () => {
   const addNew = (anecdote) => {
     anecdote.id = Math.round(Math.random() * 10000)
     setAnecdotes(anecdotes.concat(anecdote))
+    setNotification(anecdote)
+    setTimeout(() => {
+      setNotification('')
+    }, 5 * 1000)
   }
 
   const anecdoteById = (id) => anecdotes.find((a) => a.id === id)
@@ -158,7 +176,7 @@ const App = () => {
   return (
     <div>
       <h1>Software anecdotes</h1>
-      <Menu anecdotes={anecdotes} />
+      <Menu anecdotes={anecdotes} addNew={addNew} notification={notification} />
       <Footer />
     </div>
   )
