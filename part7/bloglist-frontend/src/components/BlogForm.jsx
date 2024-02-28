@@ -1,7 +1,7 @@
 import { useDispatch } from 'react-redux'
 import { useField } from '../hooks'
 import Togglable from './Togglable'
-import { onCreateBlog } from '../reducers/blogReducer'
+import { createBlogOf } from '../reducers/blogReducer'
 
 const BlogForm = ({ blogFormRef }) => {
   const { reset: resetNewTitle, ...newTitle } = useField('newTitle')
@@ -16,7 +16,7 @@ const BlogForm = ({ blogFormRef }) => {
       author: newAuthor.value,
       url: newUrl.value,
     }
-    dispatch(onCreateBlog(blogObject))
+    dispatch(createBlogOf(blogObject))
     resetNewTitle()
     resetNewAuthor()
     resetNewUrl()

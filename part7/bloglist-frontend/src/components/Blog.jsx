@@ -1,21 +1,26 @@
 import { useState, useRef } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { likeBlogOf, removeBlogOf } from '../reducers/blogReducer'
 import Togglable from './Togglable'
 
-const removeButton = (removeBlog) => (
-  <button id="button-remove" onClick={removeBlog}>
-    remove
-  </button>
-)
-
-const Blog = ({ blog, updateLikes, removeBlog, isRemovable }) => {
+const Blog = ({ blog, isRemovable }) => {
+  const dispatch = useDispatch()
   const viewFormRef = useRef()
-  const [likes, setLikes] = useState(blog.likes)
 
   const handleLikes = async () => {
-    const res = await updateLikes()
-    blog.likes = res.likes
-    setLikes(res.likes)
+    dispatch(likeBlogOf(blog))
   }
+
+  const removeButton = blog => (
+    <button
+      id="button-remove"
+      onClick={() => {
+        dispatch(removeBlogOf(blog))
+      }}
+    >
+      remove
+    </button>
+  )
 
   const blogStyle = {
     paddingTop: 10,
@@ -32,14 +37,14 @@ const Blog = ({ blog, updateLikes, removeBlog, isRemovable }) => {
         <ul>
           <div>{blog.url}</div>
           <div>
-            likes {likes}
+            likes {blog.likes}
             <button id="btn-likes" onClick={handleLikes}>
               like
             </button>
           </div>
           <div>{blog.author}</div>
         </ul>
-        {isRemovable && removeButton(removeBlog)}
+        {isRemovable && removeButton(blog)}
       </Togglable>
     </div>
   )

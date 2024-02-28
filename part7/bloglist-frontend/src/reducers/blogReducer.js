@@ -6,16 +6,13 @@ const blogSlice = createSlice({
   name: 'blogs',
   initialState: [],
   reducers: {
-    createBlog(state, action) {
-      state.push(action.payload)
-    },
     setBlogs(state, action) {
       return action.payload
     },
     appendBlog(state, action) {
       state.push(action.payload)
     },
-    likeBlogOf(state, action) {
+    onLikeBlog(state, action) {
       const id = action.payload.id
       const blogs = JSON.parse(JSON.stringify(state))
       const blogToLike = blogs.find(n => n.id === id)
@@ -25,11 +22,15 @@ const blogSlice = createSlice({
       }
       return blogs.map(blog => (blog.id !== id ? blog : changedBlog))
     },
-    removeBlog(state, action) {},
+    onRemoveBlog(state, action) {
+      const id = action.payload.id
+      const blogs = JSON.parse(JSON.stringify(state))
+      return blogs.filter(blog => blog.id !== id)
+    },
   },
 })
 
-export const { setBlogs, appendBlog, likeBlogOf, removeBlog } = blogSlice.actions
+export const { setBlogs, appendBlog, onLikeBlog, onRemoveBlog } = blogSlice.actions
 
 export const onInitializeBlogs = () => {
   return async dispatch => {
@@ -38,10 +39,10 @@ export const onInitializeBlogs = () => {
   }
 }
 
-export const onCreateBlog = blogObject => {
+export const createBlogOf = blog => {
   return async dispatch => {
     try {
-      const createdBlog = await blogsService.create(blogObject)
+      const createdBlog = await blogsService.create(blog)
       dispatch(appendBlog(createdBlog))
       dispatch(showNotificationOf('a new blog ' + createdBlog.title + ' by ' + createdBlog.author + ' added'))
     } catch (exception) {
@@ -50,10 +51,23 @@ export const onCreateBlog = blogObject => {
   }
 }
 
-export const onLikeBlog = blog => {
+export const likeBlogOf = blog => {
   return async dispatch => {
-    const likeBlog = await blogsService.update(blog)
-    dispatch(likeBlogOf(likeBlog))
+    const likedBlog = {
+      ...blog,
+      likes: blog.likes + 1,
+    }
+    const likeBlog = await blogsService.update(likedBlog.id, likedBlog)
+    dispatch(onLikeBlog(likeBlog))
+  }
+}
+
+export const removeBlogOf = blog => {
+  return async dispatch => {
+    if (window.confirm(`Remove blog ${blog.title} by ${blog.author}`)) {
+      await blogsService.remove(blog.id)
+      dispatch(onRemoveBlog(blog))
+    }
   }
 }
 
