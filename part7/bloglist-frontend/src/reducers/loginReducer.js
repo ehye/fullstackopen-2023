@@ -4,16 +4,25 @@ import loginService from '../services/login'
 
 const loginSlice = createSlice({
   name: 'loginUser',
-  initialState: [],
+  initialState: null,
   reducers: {
-    logout(state, action) {
+    onLogin(state, action) {
+      if (action.payload) {
+        console.log(action.payload)
+        window.localStorage.setItem('loggedBlogAppUser', JSON.stringify(action.payload))
+        return action.payload
+      }
+      // window.location.reload()
+    },
+    onLogout(state, action) {
       window.localStorage.removeItem('loggedBlogAppUser')
-      window.location.reload()
+      // window.location.reload()
+      return null
     },
   },
 })
 
-export const { logout } = loginSlice.actions
+export const { onLogin, onLogout } = loginSlice.actions
 
 export const login = ({ username, password }) => {
   return dispatch => {
@@ -23,8 +32,7 @@ export const login = ({ username, password }) => {
         password,
       })
       .then(res => {
-        window.localStorage.setItem('loggedBlogAppUser', JSON.stringify(res))
-        window.location.reload()
+        dispatch(onLogin(res))
       })
       .catch(({ response }) => {
         dispatch(showNotificationOf(response.data.error))
