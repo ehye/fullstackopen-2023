@@ -1,12 +1,13 @@
 import { useState, useEffect, useRef } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { onInitializeBlogs } from './reducers/blogReducer'
-import { onLogin, onLogout } from './reducers/loginReducer'
+import { onLogin } from './reducers/loginReducer'
 
 import Notification from './components/Notification'
 import BlogForm from './components/BlogForm'
 import LoginForm from './components/LoginForm'
 import BlogList from './components/BlogList'
+import UserPanel from './components/UserPanel'
 
 import blogService from './services/blogs'
 import './index.css'
@@ -28,26 +29,13 @@ const App = () => {
     }
   }, [dispatch])
 
-  const loginForm = () => <LoginForm />
-
-  const handleLogout = () => {
-    dispatch(onLogout())
-    // window.localStorage.removeItem('loggedBlogAppUser')
-    // setUser(null)
-  }
-
   return (
     <div>
       <h2>blogs</h2>
-      {!user && loginForm()}
+      {!user && (() => <LoginForm />)()}
       {user && (
         <div>
-          <p>
-            {user.name} logged in{' '}
-            <button id="button-logout" onClick={handleLogout}>
-              logout
-            </button>
-          </p>
+          <UserPanel />
           <Notification />
           <BlogList user={user} />
           <BlogForm blogFormRef={blogFormRef} />

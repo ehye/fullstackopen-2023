@@ -8,15 +8,12 @@ const loginSlice = createSlice({
   reducers: {
     onLogin(state, action) {
       if (action.payload) {
-        console.log(action.payload)
         window.localStorage.setItem('loggedBlogAppUser', JSON.stringify(action.payload))
         return action.payload
       }
-      // window.location.reload()
     },
     onLogout(state, action) {
       window.localStorage.removeItem('loggedBlogAppUser')
-      // window.location.reload()
       return null
     },
   },

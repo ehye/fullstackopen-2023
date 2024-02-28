@@ -13,7 +13,6 @@ const LoginForm = () => {
     dispatch(login({ username: event.target.username.value, password: event.target.password.value }))
     event.target.username.value = ''
     event.target.password.value = ''
-    // window.location.reload()
   }
 
   return (
@@ -22,11 +21,11 @@ const LoginForm = () => {
       <form onSubmit={handleLogin}>
         <div>
           username
-          <input id="username" type="text" {...username} value="mluukkai" />
+          <input id="username" type="text" {...username} />
         </div>
         <div>
           password
-          <input id="password" type="password" {...password} value="salainen" />
+          <input id="password" type="password" {...password} />
         </div>
         <button id="login-button" type="submit">
           login
