@@ -4,8 +4,8 @@ import { useField } from '../hooks'
 import ErrorNotification from './ErrorNotification'
 
 const LoginForm = () => {
-  const username = useField('username')
-  const password = useField('password')
+  const { reset: resetUsername, ...username } = useField('username')
+  const { reset: resetPassword, ...password } = useField('password')
   const dispatch = useDispatch()
 
   const handleLogin = async event => {
