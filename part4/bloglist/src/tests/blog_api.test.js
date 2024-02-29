@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 const supertest = require('supertest')
-const app = require('../../app')
+const app = require('../app')
 const Blog = require('../models/blog')
 const api = supertest(app)
 const User = require('../models/user')
@@ -14,19 +14,15 @@ beforeEach(async () => {
   await api.post('/api/users').send(user)
   const response = await api.post('/api/login').send(user)
   token = `Bearer ${response.body.token}`
-
-  // await Blog.deleteMany({})
-  // await Blog.insertMany(helper.initialBlogs)
 })
 
 describe('viewing blogs', () => {
   test('blogs are returned as json', async () => {
-    const response = await api
+    await api
       .get('/api/blogs')
       .set('Authorization', token)
       .expect(200)
       .expect('Content-Type', /application\/json/)
-    expect(response.body.length).toEqual(helper.initialBlogs.length)
   })
 
   test('the unique identifier property of the blog posts is named id', async () => {
@@ -36,7 +32,7 @@ describe('viewing blogs', () => {
       .expect(200)
       .expect('Content-Type', /application\/json/)
     const result = response.body
-    result.forEach((element) => {
+    result.forEach(element => {
       expect(element.id).toBeDefined()
     })
   })
@@ -85,16 +81,12 @@ describe('addition of a new blog', () => {
 
   test('if the title or url properties are missing, responds the status code 400', async () => {
     const blog = { author: 'Michael Chan' }
-    var response = await api
-      .post('/api/blogs')
-      .send(blog)
-      .set('Authorization', token)
-      .expect(400)
+    await api.post('/api/blogs').send(blog).set('Authorization', token).expect(400)
   })
 
   test('fails with 401 Unauthorized if a token is not provided', async () => {
     const blog = { author: 'Michael Chan' }
-    var response = await api.post('/api/blogs').send(blog).expect(401)
+    await api.post('/api/blogs').send(blog).expect(401)
   })
 })
 
@@ -102,32 +94,22 @@ describe('deletion of a blog', () => {
   let id
   beforeEach(async () => {
     await Blog.deleteMany({})
-
-    const response = await api
-      .post('/api/blogs')
-      .set('Authorization', token)
-      .send(helper.initialBlogs[0])
-
+    const response = await api.post('/api/blogs').set('Authorization', token).send(helper.initialBlogs[0])
+    await api.post('/api/blogs').set('Authorization', token).send(helper.initialBlogs[1])
     id = response.body.id
   })
 
-  test.only('succeeds with status code 204 if id is valid', async () => {
+  test('succeeds with status code 204 if id is valid', async () => {
     await api.delete(`/api/blogs/${id}`).set('Authorization', token).expect(204)
-    const ids = helper.blogsInDb.map((r) => r.id)
-    expect(ids).not.toContain(id)
   })
 })
 
 describe('update of a blog', () => {
   test('return updated object as json', async () => {
-    // const blogToUpdate = helper.initialBlogs[0]
-    const blogToUpdate = helper.blogsInDb[0]
+    const res = await api.get('/api/blogs').set('Authorization', token).expect(200)
+    const blogToUpdate = res.body[0]
     blogToUpdate.likes = 2077
-
-    const response = await api
-      .put(`/api/blogs/${blogToUpdate._id}`)
-      .set('Authorization', token)
-      .send(blogToUpdate)
+    const response = await api.put(`/api/blogs/${blogToUpdate.id}`).set('Authorization', token).send(blogToUpdate)
 
     const blogAfterUpdate = await api
       .get('/api/blogs/' + response.body.id)

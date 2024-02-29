@@ -45,20 +45,18 @@ blogsRouter.put('/:id', async (request, response) => {
     name: 1,
     id: 1,
   })
-  if (blog.user.id.toString() === request.body.user) {
-    blog = {
-      title: request.body.title,
-      author: request.body.author,
-      url: request.body.url,
-      likes: request.body.likes,
-    }
-    const updateResult = await Blog.findByIdAndUpdate(request.params.id, blog, {
-      new: true,
-      runValidators: true,
-      context: 'query',
-    })
-    response.json(updateResult)
+  blog = {
+    title: request.body.title,
+    author: request.body.author,
+    url: request.body.url,
+    likes: request.body.likes,
   }
+  const updateResult = await Blog.findByIdAndUpdate(request.params.id, blog, {
+    new: true,
+    runValidators: true,
+    context: 'query',
+  })
+  response.json(updateResult)
 })
 
 blogsRouter.delete('/:id', userExtractor, async (request, response) => {
@@ -70,10 +68,10 @@ blogsRouter.delete('/:id', userExtractor, async (request, response) => {
     return response.status(401).json({ error: 'operation not permitted' })
   }
 
-  user.blogs = user.blogs.filter((b) => b.toString() !== blog.id.toString())
+  user.blogs = user.blogs.filter(b => b.toString() !== blog.id.toString())
 
   await user.save()
-  await blog.remove()
+  await Blog.findByIdAndDelete(blog.id)
 
   response.status(204).end()
 })

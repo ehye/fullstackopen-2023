@@ -4,12 +4,12 @@ const cors = require('cors')
 const mongoose = require('mongoose')
 require('express-async-errors')
 
-const config = require('./src/utils/config')
-const logger = require('./src/utils/logger')
-const middleware = require('./src/utils/middleware')
-const blogsRouter = require('./src/controllers/blogs')
-const usersRouter = require('./src/controllers/users')
-const loginRouter = require('./src/controllers/login')
+const config = require('./utils/config')
+const logger = require('./utils/logger')
+const middleware = require('./utils/middleware')
+const blogsRouter = require('./controllers/blogs')
+const usersRouter = require('./controllers/users')
+const loginRouter = require('./controllers/login')
 
 mongoose
   .connect(config.MONGODB_URI)
@@ -30,7 +30,7 @@ app.use('/api/users', usersRouter)
 app.use('/api/login', loginRouter)
 
 if (process.env.NODE_ENV === 'test') {
-  const testingRouter = require('./src/controllers/testing')
+  const testingRouter = require('./controllers/testing')
   app.use('/api/testing', testingRouter)
 }
 
