@@ -10,6 +10,7 @@ import LoginForm from './components/LoginForm'
 import BlogList from './components/BlogList'
 import UserPanel from './components/UserPanel'
 import Users from './components/Users'
+import User from './components/User'
 
 import blogService from './services/blogs'
 import './index.css'
@@ -37,16 +38,17 @@ const App = () => {
   return (
     <div>
       <Router>
-        <div>
-          <Link style={padding} to="/">
-            Home
-          </Link>
-          <Link style={padding} to="/users">
-            users
-          </Link>
-        </div>
-        <h2>blogs</h2>
-        <UserPanel />
+        {user && (
+          <div>
+            <Link style={padding} to="/">
+              Home
+            </Link>
+            <Link style={padding} to="/users">
+              users
+            </Link>
+            <UserPanel />
+          </div>
+        )}
 
         <Routes>
           <Route
@@ -54,6 +56,7 @@ const App = () => {
             element={
               user ? (
                 <div>
+                  <h2>blogs</h2>
                   <Notification />
                   <BlogList user={user} />
                   <BlogForm blogFormRef={blogFormRef} />
@@ -64,6 +67,7 @@ const App = () => {
             }
           />
           <Route path="/users" element={<Users />} />
+          <Route path="/users/:id" element={<User />} />
         </Routes>
       </Router>
     </div>
