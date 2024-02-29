@@ -13,9 +13,12 @@ const UserPanel = () => {
   const padding = {
     padding: 5,
   }
+  const inline = {
+    display: 'inline-block',
+  }
 
   return (
-    <div>
+    <div style={inline}>
       <Link style={padding} to={`/users/${user.id}`}>
         {user.name}
       </Link>

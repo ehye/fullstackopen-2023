@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, Link, Navigate } from 'react-router-dom'
 import { onInitializeBlogs } from './reducers/blogReducer'
 import { onLogin } from './reducers/loginReducer'
 
@@ -36,11 +36,15 @@ const App = () => {
     padding: 5,
   }
 
+  const inline = {
+    display: 'inline-block',
+  }
+
   return (
     <div>
       <Router>
         {user && (
-          <div>
+          <div style={inline}>
             <Link style={padding} to="/">
               Home
             </Link>
@@ -63,11 +67,12 @@ const App = () => {
                   <BlogForm blogFormRef={blogFormRef} />
                 </div>
               ) : (
-                (() => <LoginForm />)()
+                <Navigate to="/login" />
               )
             }
           />
-          <Route path="/users" element={<Users />} />
+          <Route path="/login" element={user ? <Navigate to="/" /> : <LoginForm />} />
+          <Route path="/users" element={user ? <Navigate to="/" /> : <Users />} />
           <Route path="/users/:id" element={<User />} />
           <Route path="/blogs/:id" element={<Blog />} />
         </Routes>

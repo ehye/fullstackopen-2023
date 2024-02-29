@@ -1,13 +1,14 @@
 import { useDispatch, useSelector } from 'react-redux'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate, useMatch } from 'react-router-dom'
 import { likeBlogOf, removeBlogOf } from '../reducers/blogReducer'
 
 const Blog = () => {
+  const match = useMatch('/blogs/:id')
   const navigate = useNavigate()
   const dispatch = useDispatch()
   const blogs = useSelector(({ blogs }) => blogs)
   const id = useParams().id
-  const blog = blogs.find(b => b.id === id)
+  const blog = match ? blogs.find(b => b.id === id) : null
   const user = useSelector(({ login }) => login)
 
   const handleLikes = async () => {

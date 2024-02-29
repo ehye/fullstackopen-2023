@@ -1,5 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit'
 import { showNotificationOf } from '../reducers/notificationReducer'
+import { onGetAllUsers } from './userReducer'
+import { onInitializeBlogs } from './blogReducer'
 import loginService from '../services/login'
 
 const loginSlice = createSlice({
@@ -30,6 +32,8 @@ export const login = ({ username, password }) => {
       })
       .then(res => {
         dispatch(onLogin(res))
+        dispatch(onInitializeBlogs())
+        dispatch(onGetAllUsers())
       })
       .catch(({ response }) => {
         dispatch(showNotificationOf(response.data.error))
