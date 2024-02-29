@@ -8,6 +8,7 @@ import Notification from './components/Notification'
 import BlogForm from './components/BlogForm'
 import LoginForm from './components/LoginForm'
 import BlogList from './components/BlogList'
+import Blog from './components/Blog'
 import UserPanel from './components/UserPanel'
 import Users from './components/Users'
 import User from './components/User'
@@ -68,6 +69,7 @@ const App = () => {
           />
           <Route path="/users" element={<Users />} />
           <Route path="/users/:id" element={<User />} />
+          <Route path="/blogs/:id" element={<Blog />} />
         </Routes>
       </Router>
     </div>

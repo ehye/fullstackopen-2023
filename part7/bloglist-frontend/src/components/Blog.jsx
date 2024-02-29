@@ -1,14 +1,21 @@
-import { useState, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { useParams, useNavigate } from 'react-router-dom'
 import { likeBlogOf, removeBlogOf } from '../reducers/blogReducer'
-import Togglable from './Togglable'
 
-const Blog = ({ blog, isRemovable }) => {
+const Blog = () => {
+  const navigate = useNavigate()
   const dispatch = useDispatch()
-  const viewFormRef = useRef()
+  const blogs = useSelector(({ blogs }) => blogs)
+  const id = useParams().id
+  const blog = blogs.find(b => b.id === id)
+  const user = useSelector(({ login }) => login)
 
   const handleLikes = async () => {
     dispatch(likeBlogOf(blog))
+  }
+
+  const isRemovable = () => {
+    user.id === blog.user?.id
   }
 
   const removeButton = blog => (
@@ -16,36 +23,25 @@ const Blog = ({ blog, isRemovable }) => {
       id="button-remove"
       onClick={() => {
         dispatch(removeBlogOf(blog))
+        navigate('/')
       }}
     >
       remove
     </button>
   )
 
-  const blogStyle = {
-    paddingTop: 10,
-    paddingLeft: 2,
-    border: 'solid',
-    borderWidth: 1,
-    marginBottom: 5,
-  }
-
   return (
-    <div className="blog" style={blogStyle}>
-      {blog.title}
-      <Togglable buttonLabel="view" toggleButtonLabel="hide" ref={viewFormRef}>
-        <ul>
-          <div>{blog.url}</div>
-          <div>
-            likes {blog.likes}
-            <button id="btn-likes" onClick={handleLikes}>
-              like
-            </button>
-          </div>
-          <div>{blog.author}</div>
-        </ul>
-        {isRemovable && removeButton(blog)}
-      </Togglable>
+    <div>
+      <h2>{blog.title}</h2>
+      <a href={blog.url}>{blog.url}</a>
+      <div>
+        {blog.likes} likes
+        <button id="btn-likes" onClick={handleLikes}>
+          like
+        </button>
+      </div>
+      <div>added by {blog.author}</div>
+      {isRemovable && removeButton(blog)}
     </div>
   )
 }
