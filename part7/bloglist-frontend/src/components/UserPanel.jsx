@@ -1,5 +1,6 @@
 import { useSelector, useDispatch } from 'react-redux'
 import { Link } from 'react-router-dom'
+import { Button } from 'react-bootstrap'
 import { onLogout } from '../reducers/loginReducer'
 
 const UserPanel = () => {
@@ -19,12 +20,10 @@ const UserPanel = () => {
 
   return (
     <div style={inline}>
-      <Link style={padding} to={`/users/${user.id}`}>
-        {user.name}
-      </Link>
-      <button id="button-logout" onClick={handleLogout}>
+      <Link to={`/users/${user.id}`}>{user.name}</Link>
+      <Button id="button-logout" variant="link" onClick={handleLogout}>
         logout
-      </button>
+      </Button>
     </div>
   )
 }

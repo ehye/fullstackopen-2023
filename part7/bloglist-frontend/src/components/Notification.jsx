@@ -1,4 +1,5 @@
 import { useSelector } from 'react-redux'
+import { Alert } from 'react-bootstrap'
 
 const Notification = () => {
   const style = {
@@ -12,7 +13,7 @@ const Notification = () => {
   if (notification === '') {
     return
   } else {
-    return <div style={style}>{notification}</div>
+    return <Alert variant="success">{notification}</Alert>
   }
 }
 

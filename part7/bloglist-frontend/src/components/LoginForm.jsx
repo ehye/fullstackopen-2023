@@ -2,6 +2,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { login } from '../reducers/loginReducer'
 import { useField } from '../hooks'
 import ErrorNotification from './ErrorNotification'
+import { Table, Form, Button } from 'react-bootstrap'
 
 const LoginForm = () => {
   const { reset: resetUsername, ...username } = useField('username')
@@ -18,19 +19,19 @@ const LoginForm = () => {
   return (
     <div>
       <ErrorNotification />
-      <form onSubmit={handleLogin}>
-        <div>
-          username
-          <input id="username" type="text" {...username} />
-        </div>
-        <div>
-          password
-          <input id="password" type="password" {...password} />
-        </div>
-        <button id="login-button" type="submit">
+      <Form onSubmit={handleLogin}>
+        <Form.Group>
+          <Form.Label>username:</Form.Label>
+          <Form.Control id="username" type="text" {...username} />
+        </Form.Group>
+        <Form.Group>
+          <Form.Label>password:</Form.Label>
+          <Form.Control id="password" type="password" {...password} />
+        </Form.Group>
+        <Button variant='primary' id="login-button" type="submit">
           login
-        </button>
-      </form>
+        </Button>
+      </Form>
     </div>
   )
 }

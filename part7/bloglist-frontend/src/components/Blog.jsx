@@ -2,6 +2,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useParams, useNavigate, useMatch } from 'react-router-dom'
 import { useField } from '../hooks'
 import { likeBlogOf, removeBlogOf, makeCommentOf } from '../reducers/blogReducer'
+import { Table, Form, Button } from 'react-bootstrap'
 
 const Blog = () => {
   const match = useMatch('/blogs/:id')
@@ -31,7 +32,8 @@ const Blog = () => {
   }
 
   const removeButton = blog => (
-    <button
+    <Button
+      variant="danger"
       id="button-remove"
       onClick={() => {
         dispatch(removeBlogOf(blog))
@@ -39,7 +41,7 @@ const Blog = () => {
       }}
     >
       remove
-    </button>
+    </Button>
   )
 
   return (
@@ -48,9 +50,9 @@ const Blog = () => {
       <a href={blog.url}>{blog.url}</a>
       <div>
         {blog.likes} likes
-        <button id="btn-likes" onClick={handleLikes}>
+        <Button id="btn-likes" onClick={handleLikes}>
           like
-        </button>
+        </Button>
       </div>
       <div>added by {blog.author}</div>
       {isRemovable && removeButton(blog)}

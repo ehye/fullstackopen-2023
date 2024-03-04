@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { BrowserRouter as Router, Routes, Route, Link, Navigate } from 'react-router-dom'
+import { Table, Form, Button, Navbar, Nav } from 'react-bootstrap'
 import { onInitializeBlogs } from './reducers/blogReducer'
 import { onLogin } from './reducers/loginReducer'
 
@@ -41,17 +42,30 @@ const App = () => {
   }
 
   return (
-    <div>
+    <div className="container">
       <Router>
         {user && (
           <div style={inline}>
-            <Link style={padding} to="/">
-              Home
-            </Link>
-            <Link style={padding} to="/users">
-              users
-            </Link>
-            <UserPanel />
+            <Navbar collapseOnSelect expand="lg">
+              <Navbar.Toggle aria-controls="responsive-navbar-nav" />
+              <Navbar.Collapse id="responsive-navbar-nav">
+                <Nav className="me-auto">
+                  <Nav.Link href="#" as="span">
+                    <Link style={padding} to="/">
+                      home
+                    </Link>
+                  </Nav.Link>
+                  <Nav.Link href="#" as="span">
+                    <Link style={padding} to="/users">
+                      users
+                    </Link>
+                  </Nav.Link>
+                  <Nav.Link href="#" as="span">
+                    <UserPanel />
+                  </Nav.Link>
+                </Nav>
+              </Navbar.Collapse>
+            </Navbar>
           </div>
         )}
 
@@ -72,7 +86,7 @@ const App = () => {
             }
           />
           <Route path="/login" element={user ? <Navigate to="/" /> : <LoginForm />} />
-          <Route path="/users" element={user ? <Navigate to="/" /> : <Users />} />
+          <Route path="/users" element={<Users />} />
           <Route path="/users/:id" element={<User />} />
           <Route path="/blogs/:id" element={<Blog />} />
         </Routes>

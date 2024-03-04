@@ -1,13 +1,19 @@
 import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Link } from 'react-router-dom'
+import { Navigate, Link } from 'react-router-dom'
 import { onGetAllUsers } from '../reducers/userReducer'
 
 const Users = () => {
+  const login = useSelector(({ login }) => login)
+
   const dispatch = useDispatch()
   useEffect(() => {
-    dispatch(onGetAllUsers())
-  }, [dispatch])
+    if (login) {
+      dispatch(onGetAllUsers())
+    } else {
+      return <Navigate to="/login" />
+    }
+  }, [dispatch, login])
 
   const users = useSelector(({ users }) => users)
 
