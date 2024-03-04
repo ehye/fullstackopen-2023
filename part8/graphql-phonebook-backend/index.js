@@ -177,7 +177,7 @@ const resolvers = {
       author.born = args.setBornTo
       authors = authors.map(a => (a.id === author.id ? author : a))
 
-      return { name: author.name, born: author.born }
+      return author
     },
   },
   Book: {
