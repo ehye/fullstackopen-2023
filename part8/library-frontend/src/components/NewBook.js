@@ -1,21 +1,35 @@
 import { useState } from 'react'
+import { gql, useMutation } from '@apollo/client'
 
-const NewBook = (props) => {
+const CREATE_BOOK = gql`
+  mutation AddBook($title: String!, $published: Int!, $author: String, $genres: [String]) {
+    addBook(title: $title, published: $published, author: $author, genres: $genres) {
+      id
+    }
+  }
+`
+
+const NewBook = props => {
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
   const [published, setPublished] = useState('')
   const [genre, setGenre] = useState('')
   const [genres, setGenres] = useState([])
+  const [createBook] = useMutation(CREATE_BOOK)
 
   if (!props.show) {
     return null
   }
 
-  const submit = async (event) => {
+  const submit = async event => {
     event.preventDefault()
-
-    console.log('add book...')
-
+    console.log('add book...', {
+      title,
+      author,
+      published,
+      genres,
+    })
+    createBook({ variables: { title, published, author, genres } })
     setTitle('')
     setPublished('')
     setAuthor('')
@@ -33,31 +47,18 @@ const NewBook = (props) => {
       <form onSubmit={submit}>
         <div>
           title
-          <input
-            value={title}
-            onChange={({ target }) => setTitle(target.value)}
-          />
+          <input value={title} onChange={({ target }) => setTitle(target.value)} />
         </div>
         <div>
           author
-          <input
-            value={author}
-            onChange={({ target }) => setAuthor(target.value)}
-          />
+          <input value={author} onChange={({ target }) => setAuthor(target.value)} />
         </div>
         <div>
           published
-          <input
-            type="number"
-            value={published}
-            onChange={({ target }) => setPublished(target.value)}
-          />
+          <input type="number" value={published} onChange={({ target }) => setPublished(Number(target.value))} />
         </div>
         <div>
-          <input
-            value={genre}
-            onChange={({ target }) => setGenre(target.value)}
-          />
+          <input value={genre} onChange={({ target }) => setGenre(target.value)} />
           <button onClick={addGenre} type="button">
             add genre
           </button>
