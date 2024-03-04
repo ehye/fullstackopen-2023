@@ -50,7 +50,13 @@ const Authors = props => {
       </table>
       <h3>Set year of birth</h3>
       name
-      <input value={name} onChange={({ target }) => setName(target.value)} />
+      <select onChange={({ target }) => setName(target.value)}>
+        {authors.map(a => (
+          <option key={a.id} value={a.name}>
+            {a.name}
+          </option>
+        ))}
+      </select>
       age
       <input value={age} onChange={({ target }) => setAge(target.value)} />
       <button onClick={updateAge}>update author</button>
