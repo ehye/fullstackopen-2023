@@ -98,6 +98,7 @@ const typeDefs = `
   }
 
   type Author {
+    id: String!
     name: String
     born: Int
     bookCount: Int
@@ -116,7 +117,11 @@ const typeDefs = `
       author: String
       published: Int!
       genres: [String]
-    ): Book
+    ): Book,
+    editAuthor(
+      name: String!,
+      setBornTo: Int!,
+    ): Author
   }
 `
 
@@ -136,7 +141,7 @@ const resolvers = {
     },
     allAuthors: () =>
       authors.map(author => ({
-        name: author.name,
+        ...author,
         bookCount: books.filter(book => book.author === author.name).length,
       })),
   },
@@ -151,6 +156,7 @@ const resolvers = {
         })
       }
       const author = {
+        id: uuidv4(),
         name: args.author,
       }
       authors = authors.concat(author)
@@ -163,6 +169,16 @@ const resolvers = {
 
       return book
     },
+    editAuthor: (root, args) => {
+      let author = authors.find(a => a.name == args.name)
+      if (!author) {
+        return null
+      }
+      author.born = args.setBornTo
+      authors = authors.map(a => (a.id === author.id ? author : a))
+
+      return { name: author.name, born: author.born }
+    },
   },
   Book: {
     title: root => root.title,
@@ -170,6 +186,12 @@ const resolvers = {
     author: root => root.author,
     id: root => root.id,
     genres: root => root.genres,
+  },
+  Author: {
+    id: root => root.id,
+    name: root => root.name,
+    born: root => root.born,
+    bookCount: root => root.bookCount,
   },
 }
 
