@@ -12,6 +12,11 @@ const schema = new mongoose.Schema({
       ref: 'User',
     },
   ],
+  favorite: [
+    {
+      type: String,
+    },
+  ],
 })
 
 module.exports = mongoose.model('User', schema)

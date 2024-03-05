@@ -126,7 +126,7 @@ const typeDefs = `
 
   type User {
     username: String!
-    friends: [User!]!
+    favorite: [String]
     id: ID!
   }
   
@@ -137,9 +137,10 @@ const typeDefs = `
   type Query {
     bookCount: Int,
     authorCount: Int,
-    allBooks(author: String, genre: String): [Book],
+    allBooks(author: String, genres: [String]): [Book],
     allAuthors: [Author!]!,
-    me: User
+    me: User,
+    favorite: [String]
   }
 
   type Mutation {
@@ -162,7 +163,10 @@ const typeDefs = `
     login(
       username: String!
       password: String!
-    ): Token
+    ): Token,
+    addAsFavorite(
+      genre: String!
+    ): User
   }
 `
 
@@ -171,13 +175,17 @@ const resolvers = {
     bookCount: async () => await Book.countDocuments({}),
     authorCount: async () => await Author.countDocuments({}),
     allBooks: async (root, args) => {
-      if (args.genre) {
-        return await Book.find({ genres: args.genre })
+      if (args.genres) {
+        return await Book.find({ genres: { $in: [...args.genres] } })
       } else {
-        return await Book.find({})
+        return await Book.find({}).populate('author')
       }
     },
-    allAuthors: async () => await Author.find({}),
+    allAuthors: async () => {
+      const authors = await Author.find({})
+      let r = authors.map(author => {author})
+      return
+    },
     me: (root, args, context) => context.currentUser,
   },
   Mutation: {
@@ -284,6 +292,19 @@ const resolvers = {
 
       return { value: jwt.sign(userForToken, process.env.JWT_SECRET) }
     },
+    addAsFavorite: async (root, args, { currentUser }) => {
+      if (!currentUser) {
+        throw new GraphQLError('wrong credentials', {
+          extensions: { code: 'BAD_USER_INPUT' },
+        })
+      }
+      if (!currentUser.favorite.includes(args.genre)) {
+        currentUser.favorite.push(args.genre)
+        await currentUser.save()
+      }
+
+      return currentUser
+    },
   },
   Book: {
     title: root => root.title,
@@ -311,7 +332,7 @@ startStandaloneServer(server, {
     const auth = req ? req.headers.authorization : null
     if (auth && auth.startsWith('Bearer ')) {
       const decodedToken = jwt.verify(auth.substring(7), process.env.JWT_SECRET)
-      const currentUser = await User.findById(decodedToken.id).populate('friends')
+      const currentUser = await User.findById(decodedToken.id).populate('favorite')
       return { currentUser }
     }
   },
