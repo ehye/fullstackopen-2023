@@ -156,29 +156,35 @@ const resolvers = {
   },
   Mutation: {
     addBook: async (root, args) => {
-      // const hasAuthor = await Author.findOne({ name: args.author })
-      // if (hasAuthor) {
-      //   throw new GraphQLError('Name must be unique', {
-      //     extensions: {
-      //       code: 'BAD_USER_INPUT',
-      //       invalidArgs: args.name,
-      //     },
-      //   })
-      // } else {
-      // const author = new Author({ name: args.author })
-      // await author.save()
       const book = new Book({
         title: args.title,
         // author: args.author,
         published: args.published,
         genres: args.genres,
       })
-      return await book.save()
-      // }
+      try {
+        return await book.save()
+      } catch (error) {
+        throw new GraphQLError('Saving book failed', {
+          extensions: {
+            code: 'BAD_USER_INPUT',
+            error: error.message,
+          },
+        })
+      }
     },
     addAuthor: async (root, args) => {
       const author = new Author({ ...args })
-      return author.save()
+      try {
+        return author.save()
+      } catch (error) {
+        throw new GraphQLError('Saving author failed', {
+          extensions: {
+            code: 'BAD_USER_INPUT',
+            error: error.message,
+          },
+        })
+      }
     },
     editAuthor: async (root, args) => {
       let author = await Author.findOne({ name: args.name })
