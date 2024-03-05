@@ -170,7 +170,13 @@ const resolvers = {
   Query: {
     bookCount: async () => await Book.countDocuments({}),
     authorCount: async () => await Author.countDocuments({}),
-    allBooks: async (root, args) => await Book.find({ genres: args.genre }),
+    allBooks: async (root, args) => {
+      if (args.genre) {
+        return await Book.find({ genres: args.genre })
+      } else {
+        return await Book.find({})
+      }
+    },
     allAuthors: async () => await Author.find({}),
     me: (root, args, context) => context.currentUser,
   },
