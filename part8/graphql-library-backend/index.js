@@ -191,9 +191,19 @@ const resolvers = {
         })
       }
 
+      const author = await Author.findOne({ name: args.author })
+      if (!author) {
+        throw new GraphQLError('author not exist', {
+          extensions: {
+            code: 'BAD_USER_INPUT',
+            invalidArgs: args.author,
+          },
+        })
+      }
+
       const book = new Book({
         title: args.title,
-        // author: args.author,
+        author: author,
         published: args.published,
         genres: args.genres,
       })
