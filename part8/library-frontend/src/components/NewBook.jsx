@@ -1,24 +1,58 @@
 import { useState } from 'react'
-import { useMutation } from '@apollo/client'
-import { ALL_BOOKS, CREATE_BOOK } from '../queries'
+import { useMutation, useSubscription } from '@apollo/client'
+import { ALL_BOOKS, CREATE_BOOK, BOOK_ADDED } from '../queries'
+import Notify from './Notify'
+
+export const updateCache = (cache, query, addedBook) => {
+  const uniqByName = a => {
+    let seen = new Set()
+    return a.filter(item => {
+      let k = item.name
+      return seen.has(k) ? false : seen.add(k)
+    })
+  }
+
+  cache.updateQuery(query, ({ allBooks }) => ({
+    allBooks: uniqByName(allBooks.concat(addedBook)),
+  }))
+}
 
 const NewBook = props => {
+  const [errorMessage, setErrorMessage] = useState(null)
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
   const [published, setPublished] = useState('')
   const [genre, setGenre] = useState('')
   const [genres, setGenres] = useState([])
   const [createBook] = useMutation(CREATE_BOOK, {
-    update: (cache, response) => {
-      cache.updateQuery({ query: ALL_BOOKS }, ({ allBooks }) => ({
-        allBooks: allBooks.concat(response.data.addBook),
-      }))
-    },
     onError: error => {
       const messages = error.graphQLErrors.map(e => e.message).join('\n')
       console.log(messages)
+      notify(messages)
     },
   })
+  useSubscription(BOOK_ADDED, {
+    onData: ({ data, client }) => {
+      console.log(data)
+      const addedBook = data.data.bookAdded
+      notify(`${addedBook.title} by ${addedBook.author.name} added`)
+      client.cache.updateQuery({ query: ALL_BOOKS }, ({ allBooks }) => {
+        return {
+          allBooks: allBooks.concat(addedBook),
+        }
+      })
+    },
+    onError: error => {
+      console.log(error)
+    },
+  })
+
+  const notify = message => {
+    setErrorMessage(message)
+    setTimeout(() => {
+      setErrorMessage(null)
+    }, 10000)
+  }
 
   if (!props.show) {
     return null
@@ -26,18 +60,14 @@ const NewBook = props => {
 
   const submit = async event => {
     event.preventDefault()
-    console.log('add book...', {
-      title,
-      author,
-      published,
-      genres,
-    })
-    createBook({ variables: { title, published, author, genres } })
-    setTitle('')
-    setPublished('')
-    setAuthor('')
-    setGenres([])
-    setGenre('')
+    if (title && published && author && genres) {
+      createBook({ variables: { title, published, author, genres } })
+      setTitle('')
+      setPublished('')
+      setAuthor('')
+      setGenres([])
+      setGenre('')
+    }
   }
 
   const addGenre = () => {
@@ -47,6 +77,7 @@ const NewBook = props => {
 
   return (
     <div>
+      <Notify errorMessage={errorMessage} />
       <form onSubmit={submit}>
         <div>
           title
