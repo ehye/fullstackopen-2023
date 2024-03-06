@@ -3,6 +3,8 @@ const User = require('./models/user')
 const Book = require('./models/book')
 const Author = require('./models/author')
 const jwt = require('jsonwebtoken')
+const { PubSub } = require('graphql-subscriptions')
+const pubsub = new PubSub()
 
 const resolvers = {
   Query: {
@@ -46,7 +48,7 @@ const resolvers = {
         genres: args.genres,
       })
       try {
-        return await book.save()
+        await book.save()
       } catch (error) {
         throw new GraphQLError('Saving book failed', {
           extensions: {
@@ -55,6 +57,10 @@ const resolvers = {
           },
         })
       }
+
+      pubsub.publish('BOOK_ADDED', { bookAdded: book })
+
+      return book
     },
     addAuthor: async (root, args) => {
       const author = new Author({ ...args })
@@ -134,6 +140,11 @@ const resolvers = {
       }
 
       return currentUser
+    },
+  },
+  Subscription: {
+    bookAdded: {
+      subscribe: () => pubsub.asyncIterator('BOOK_ADDED'),
     },
   },
   Book: {
