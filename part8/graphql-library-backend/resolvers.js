@@ -47,19 +47,18 @@ const resolvers = {
         published: args.published,
         genres: args.genres,
       })
+
       try {
         await book.save()
       } catch (error) {
         throw new GraphQLError('Saving book failed', {
           extensions: {
             code: 'BAD_USER_INPUT',
-            error: error.message,
           },
         })
       }
 
       pubsub.publish('BOOK_ADDED', { bookAdded: book })
-
       return book
     },
     addAuthor: async (root, args) => {

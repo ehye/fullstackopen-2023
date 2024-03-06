@@ -8,6 +8,20 @@ import Recommend from './components/Recommend'
 import { loadErrorMessages, loadDevMessages } from '@apollo/client/dev'
 import { useApolloClient } from '@apollo/client'
 
+export const updateCache = (cache, query, addedBook) => {
+  const uniqByTitle = a => {
+    let seen = new Set()
+    return a.filter(item => {
+      let k = item.title
+      return seen.has(k) ? false : seen.add(k)
+    })
+  }
+
+  cache.updateQuery(query, ({ allBooks }) => ({
+    allBooks: uniqByTitle(allBooks.concat(addedBook)),
+  }))
+}
+
 const App = () => {
   const [page, setPage] = useState('authors')
   const [token, setToken] = useState(null)
@@ -46,10 +60,10 @@ const App = () => {
         <button onClick={() => setPage('authors')}>authors</button>
         <button onClick={() => setPage('books')}>books</button>
         <button onClick={() => setPage('add')}>add book</button>
-        <Notify errorMessage={errorMessage} />
         <button onClick={() => setPage('recommend')}>recommend</button>
         <button onClick={logout}>logout</button>
       </div>
+      <Notify errorMessage={errorMessage} />
 
       <Authors show={page === 'authors'} />
 

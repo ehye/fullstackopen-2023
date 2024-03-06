@@ -1,21 +1,8 @@
 import { useState } from 'react'
-import { useMutation, useSubscription } from '@apollo/client'
-import { ALL_BOOKS, CREATE_BOOK, BOOK_ADDED } from '../queries'
+import { useMutation } from '@apollo/client'
 import Notify from './Notify'
-
-export const updateCache = (cache, query, addedBook) => {
-  const uniqByName = a => {
-    let seen = new Set()
-    return a.filter(item => {
-      let k = item.name
-      return seen.has(k) ? false : seen.add(k)
-    })
-  }
-
-  cache.updateQuery(query, ({ allBooks }) => ({
-    allBooks: uniqByName(allBooks.concat(addedBook)),
-  }))
-}
+import { updateCache } from '../App'
+import { ALL_BOOKS, CREATE_BOOK } from '../queries'
 
 const NewBook = props => {
   const [errorMessage, setErrorMessage] = useState(null)
@@ -24,26 +11,15 @@ const NewBook = props => {
   const [published, setPublished] = useState('')
   const [genre, setGenre] = useState('')
   const [genres, setGenres] = useState([])
+
   const [createBook] = useMutation(CREATE_BOOK, {
-    onError: error => {
-      const messages = error.graphQLErrors.map(e => e.message).join('\n')
-      console.log(messages)
-      notify(messages)
-    },
-  })
-  useSubscription(BOOK_ADDED, {
-    onData: ({ data, client }) => {
-      console.log(data)
-      const addedBook = data.data.bookAdded
-      notify(`${addedBook.title} by ${addedBook.author.name} added`)
-      client.cache.updateQuery({ query: ALL_BOOKS }, ({ allBooks }) => {
-        return {
-          allBooks: allBooks.concat(addedBook),
-        }
-      })
+    update: (cache, response) => {
+      updateCache(cache, { query: ALL_BOOKS }, response.data.addBook)
     },
     onError: error => {
       console.log(error)
+      const messages = error.graphQLErrors.map(e => e.message).join('\n')
+      notify(messages)
     },
   })
 
@@ -60,13 +36,14 @@ const NewBook = props => {
 
   const submit = async event => {
     event.preventDefault()
-    if (title && published && author && genres) {
+    if (title && published && author) {
       createBook({ variables: { title, published, author, genres } })
       setTitle('')
-      setPublished('')
       setAuthor('')
+      setPublished('')
       setGenres([])
       setGenre('')
+      window.alert(`${title} by ${author.name} added`)
     }
   }
 
