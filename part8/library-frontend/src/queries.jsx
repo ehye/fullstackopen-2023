@@ -9,9 +9,18 @@ export const LOGIN = gql`
 `
 
 export const CREATE_BOOK = gql`
-  mutation AddBook($title: String!, $published: Int!, $author: String, $genres: [String]) {
-    addBook(title: $title, published: $published, author: $author, genres: $genres) {
+  mutation AddBook($title: String!, $author: String!, $published: Int!, $genres: [String]) {
+    addBook(title: $title, author: $author, published: $published, genres: $genres) {
       id
+      genres
+      published
+      title
+      author {
+        id
+        name
+        born
+        bookCount
+      }
     }
   }
 `

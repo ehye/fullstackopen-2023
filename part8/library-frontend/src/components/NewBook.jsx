@@ -9,7 +9,11 @@ const NewBook = props => {
   const [genre, setGenre] = useState('')
   const [genres, setGenres] = useState([])
   const [createBook] = useMutation(CREATE_BOOK, {
-    refetchQueries: [{ query: ALL_BOOKS }],
+    update: (cache, response) => {
+      cache.updateQuery({ query: ALL_BOOKS }, ({ allBooks }) => ({
+        allBooks: allBooks.concat(response.data.addBook),
+      }))
+    },
     onError: error => {
       const messages = error.graphQLErrors.map(e => e.message).join('\n')
       console.log(messages)

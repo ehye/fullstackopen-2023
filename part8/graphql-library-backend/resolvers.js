@@ -15,13 +15,7 @@ const resolvers = {
         return await Book.find({}).populate('author')
       }
     },
-    allAuthors: async () => {
-      const authors = await Author.find({})
-      let r = authors.map(author => {
-        author
-      })
-      return
-    },
+    allAuthors: async () => await Author.find({}),
     me: (root, args, context) => context.currentUser,
   },
   Mutation: {
