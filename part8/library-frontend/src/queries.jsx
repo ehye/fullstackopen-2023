@@ -77,6 +77,7 @@ export const ALL_AUTHORS = gql`
   }
   ${AUTHOR_DETAIL}
 `
+
 export const UPDATE_AUTHOR = gql`
   mutation AddBook($name: String!, $setBornTo: Int!) {
     editAuthor(name: $name, setBornTo: $setBornTo) {
@@ -84,6 +85,7 @@ export const UPDATE_AUTHOR = gql`
     }
   }
 `
+
 export const ME = gql`
   query Me {
     me {

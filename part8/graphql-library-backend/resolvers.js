@@ -17,7 +17,33 @@ const resolvers = {
         return await Book.find({}).populate('author')
       }
     },
-    allAuthors: async () => await Author.find({}),
+    allAuthors: async root => {
+      try {
+        const authors = await Author.find({})
+        const authorIds = authors.map(author => author._id)
+        const bookCounts = await Book.aggregate([
+          {
+            $match: { author: { $in: authorIds } },
+          },
+          {
+            $group: {
+              _id: '$author',
+              bookCount: { $sum: 1 },
+            },
+          },
+        ])
+
+        return authors.map(author => ({
+          id: author.id.toString(),
+          name: author.name,
+          born: author.born,
+          bookCount: bookCounts.find(b => b._id.toString() == author.id)?.bookCount ?? 0,
+        }))
+      } catch (err) {
+        console.error(err)
+        throw new Error('Failed to fetch authors')
+      }
+    },
     me: (root, args, context) => context.currentUser,
   },
   Mutation: {
