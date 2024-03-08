@@ -1,8 +1,8 @@
 import express from 'express';
-import data from './data/diagnose';
+import diaRouter from './routes/diagnoses';
+import patientsRouter from './routes/patients';
 
 const cors = require('cors');
-
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -15,10 +15,8 @@ app.get(`${baseUrl}/ping`, (_req, res) => {
   res.send('pong');
 });
 
-app.get(`${baseUrl}/diagnoses`, (_req, res) => {
-  const diagnose = data;
-  res.json(diagnose);
-});
+app.use(`${baseUrl}/diagnoses`, diaRouter);
+app.use(`${baseUrl}/patients`, patientsRouter);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
