@@ -1,5 +1,6 @@
 import express from 'express';
 import patientService from '../services/patientService';
+import { isGender, isDate } from '../utils';
 
 const patientsRouter = express.Router();
 
@@ -9,8 +10,12 @@ patientsRouter.get('/', (_req, res) => {
 
 patientsRouter.post('/', (req, res) => {
   const { dateOfBirth, gender, name, occupation, ssn } = req.body;
-  const addedEntry = patientService.addPatient({ dateOfBirth, gender, name, occupation, ssn });
-  res.json(addedEntry);
+  if (isGender(gender) && isDate(dateOfBirth)) {
+    const addedEntry = patientService.addPatient({ dateOfBirth, gender, name, occupation, ssn });
+    res.json(addedEntry);
+  } else {
+    res.status(400).end();
+  }
 });
 
 export default patientsRouter;
