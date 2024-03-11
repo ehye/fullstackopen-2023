@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import { Diary, NewDiary } from './types'
 import diaryServices from './diaryServices'
+import axios from 'axios'
 import './App.css'
+
+const ErrorMessage = ({ message }: { message: string }) => <div style={{ color: 'red' }}>{message}</div>
 
 const App = () => {
   const [diaries, setDiaries] = useState<Diary[]>([])
@@ -9,6 +12,7 @@ const App = () => {
   const [weather, setWeather] = useState('')
   const [visibility, setVisibility] = useState('')
   const [comment, setComment] = useState('')
+  const [message, setMessage] = useState('')
 
   useEffect(() => {
     const getDiaries = async () => {
@@ -34,6 +38,12 @@ const App = () => {
       setDiaries(diaries)
     } catch (error) {
       console.log(error)
+      if (axios.isAxiosError(error)) {
+        setMessage(error.message)
+        setTimeout(() => {
+          setMessage('')
+        }, 5000)
+      }
     }
 
     setWeather('')
@@ -44,6 +54,7 @@ const App = () => {
   return (
     <div>
       <h2>Add new entries</h2>
+      <ErrorMessage message={message} />
       <form onSubmit={submit}>
         <div>
           date <input id="date" value={date} onChange={({ target }) => setDate(target.value)} />
