@@ -3,9 +3,13 @@ import { useParams } from 'react-router-dom';
 import MaleIcon from '@mui/icons-material/Male';
 import FemaleIcon from '@mui/icons-material/Female';
 import TransgenderIcon from '@mui/icons-material/Transgender';
-import { Diagnose, Gender, Patient } from '../../types';
+import Box from '@mui/material/Box';
+import { Diagnose, Entry, Gender, Patient } from '../../types';
 import patientService from '../../services/patients';
 import diagnoseService from '../../services/diagnose';
+import HospitalEntryItem from './HospitalEntryItem';
+import HealthCheckEntryItem from './HealthCheckEntryItem';
+import OccupationalHealthcareItem from './OccupationalHealthcareItem';
 
 const PatientDetail = () => {
   let { id } = useParams();
@@ -39,7 +43,37 @@ const PatientDetail = () => {
     }
   };
 
-  const getDiagnose = (code: string): string => diagnosis.find(d => d.code === code)?.name ?? '';
+  /**
+   * Helper function for exhaustive type checking
+   */
+  const assertNever = (value: any): never => {
+    throw new Error(`Unhandled discriminated union member: ${JSON.stringify(value)}`);
+  };
+
+  const EntryDetails: React.FC<{ entry: Entry }> = ({ entry }) => {
+    const getDiagnose = (codes: Array<string> | undefined): Array<Diagnose> => {
+      let result: Array<Diagnose>;
+      result = [];
+      codes?.forEach(code => {
+        const diagnose = diagnosis.find(d => d.code === code);
+        if (diagnose) {
+          result.push(diagnose);
+        }
+      });
+      return result;
+    };
+
+    switch (entry.type) {
+      case 'Hospital':
+        return <HospitalEntryItem entry={entry} diagnosis={getDiagnose(entry.diagnosisCodes)} />;
+      case 'HealthCheck':
+        return <HealthCheckEntryItem entry={entry} diagnosis={getDiagnose(entry.diagnosisCodes)} />;
+      case 'OccupationalHealthcare':
+        return <OccupationalHealthcareItem entry={entry} diagnosis={getDiagnose(entry.diagnosisCodes)} />;
+      default:
+        return assertNever(entry);
+    }
+  };
 
   return (
     <>
@@ -52,14 +86,10 @@ const PatientDetail = () => {
           <p>occupation: {patient.occupation}</p>
           <h3>entries</h3>
           {patient.entries.map((entry, i) => (
-            <div key={i}>
-              {entry.date} {entry.description}
-              {entry.diagnosisCodes?.map((code, j) => (
-                <li key={j}>
-                  {code} {getDiagnose(code)}
-                </li>
-              ))}
-            </div>
+            <Box key={i} sx={{ border: '2px solid grey', marginBottom: '10px', padding: '5px' }}>
+              <EntryDetails key={entry.id} entry={entry} />
+              <div> diagnose by {entry.specialist}</div>
+            </Box>
           ))}
         </>
       ) : (
