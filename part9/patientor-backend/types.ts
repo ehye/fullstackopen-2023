@@ -26,6 +26,7 @@ interface BaseEntry {
   date: string;
   specialist: string;
   diagnosisCodes?: Array<Diagnose['code']>;
+  type: string;
 }
 
 export enum HealthCheckRating {
@@ -56,3 +57,8 @@ export type Entry = HospitalEntry | OccupationalHealthcareEntry | HealthCheckEnt
 export type NonSensitivePatient = Omit<Patient, 'ssn' | 'entries'>;
 
 export type NewPatientEntry = Omit<Patient, 'id'>;
+
+// Define special omit for unions
+type UnionOmit<T, K extends string | number | symbol> = T extends unknown ? Omit<T, K> : never;
+// Define Entry without the 'id' property
+export type EntryWithoutId = UnionOmit<Entry, 'id'>;

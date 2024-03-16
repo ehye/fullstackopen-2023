@@ -22,4 +22,13 @@ patientsRouter.post('/', (req, res) => {
   }
 });
 
+patientsRouter.post('/:id/entries', (req, res) => {
+  const id = req.params.id;
+  const entry = req.body;
+  const addedEntry = patientService.addEntity({ id, entry });
+  if (typeof addedEntry === 'string') {
+    res.status(400).json(addedEntry);
+  } else res.json(addedEntry);
+});
+
 export default patientsRouter;
