@@ -25,7 +25,7 @@ const PatientListPage = ({ patients, setPatients }: Props) => {
   const closeModal = (): void => {
     setModalOpen(false);
     setError(undefined);
-  };
+  }; 
 
   const submitNewPatient = async (values: PatientFormValues) => {
     try {

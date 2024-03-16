@@ -13,7 +13,7 @@ const OccupationalHealthcareItem = ({
       {entry.date} <WorkIcon /> {entry.employerName}
       <p>{entry.description}</p>
       {entry.diagnosisCodes?.map(code => (
-        <li>
+        <li key={entry.id}>
           {code} {diagnosis.find(d => d.code === code)?.name}
         </li>
       ))}

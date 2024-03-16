@@ -7,7 +7,7 @@ const HealthCheckEntryItem = ({ entry, diagnosis }: { entry: HealthCheckEntry; d
       {entry.date} <MonitorHeartIcon />
       <p>{entry.description}</p>
       {entry.diagnosisCodes?.map(code => (
-        <li>
+        <li key={entry.id}>
           {code} {diagnosis.find(d => d.code === code)?.name}
         </li>
       ))}

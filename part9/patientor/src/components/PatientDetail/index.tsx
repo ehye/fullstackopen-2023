@@ -10,9 +10,10 @@ import diagnoseService from '../../services/diagnose';
 import HospitalEntryItem from './HospitalEntryItem';
 import HealthCheckEntryItem from './HealthCheckEntryItem';
 import OccupationalHealthcareItem from './OccupationalHealthcareItem';
+import EntryForm from './EntryForm';
 
 const PatientDetail = () => {
-  let { id } = useParams();
+  const { id } = useParams();
   const [patient, setPatient] = useState<Patient>();
   const [diagnosis, setDiagnosis] = useState<Diagnose[]>([]);
 
@@ -31,6 +32,13 @@ const PatientDetail = () => {
         console.log(error);
       });
   }, []);
+
+  const updateEntries = (addedEntry: Entry) => {
+    if (patient) {
+      setPatient({ ...patient, entries: [...patient.entries, addedEntry] });
+      console.log('patient.entries:', patient.entries);
+    }
+  };
 
   const genderIcon = (gender: Gender) => {
     switch (gender) {
@@ -84,10 +92,11 @@ const PatientDetail = () => {
           </h2>
           <p>ssn: {patient.ssn}</p>
           <p>occupation: {patient.occupation}</p>
+          <EntryForm afterCreate={updateEntries} />
           <h3>entries</h3>
           {patient.entries.map((entry, i) => (
             <Box key={i} sx={{ border: '2px solid grey', marginBottom: '10px', padding: '5px' }}>
-              <EntryDetails key={entry.id} entry={entry} />
+              <EntryDetails entry={entry} />
               <div> diagnose by {entry.specialist}</div>
             </Box>
           ))}

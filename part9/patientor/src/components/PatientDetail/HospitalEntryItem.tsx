@@ -7,7 +7,7 @@ const HospitalEntryItem = ({ entry, diagnosis }: { entry: HospitalEntry; diagnos
       {entry.date} <MedicalServicesIcon />
       <p>{entry.description}</p>
       {entry.diagnosisCodes?.map(code => (
-        <li>
+        <li key={entry.id}>
           {code} {diagnosis.find(d => d.code === code)?.name}
         </li>
       ))}

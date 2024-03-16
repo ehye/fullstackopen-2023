@@ -1,5 +1,5 @@
 import patientData from '../data/patients';
-import { Patient, NewPatientEntry, NonSensitivePatient, Entry, EntryWithoutId } from '../types';
+import { Patient, NewPatientEntry, NonSensitivePatient, Entry, EntryWithoutId, HealthCheckRating } from '../types';
 import { v1 as uuid } from 'uuid';
 
 const patients: Patient[] = patientData;
@@ -35,6 +35,12 @@ const addEntity = ({ id, entry }: { id: string; entry: EntryWithoutId }): Entry 
       if (!entry.healthCheckRating) {
         return "'healthCheckRating' field is required";
       }
+      if (
+        entry.healthCheckRating < HealthCheckRating.Healthy ||
+        entry.healthCheckRating > HealthCheckRating.CriticalRisk
+      ) {
+        return "'healthCheckRating' field is invalid";
+      }
       break;
     case 'OccupationalHealthcare':
       if (!entry.employerName) {
@@ -42,6 +48,10 @@ const addEntity = ({ id, entry }: { id: string; entry: EntryWithoutId }): Entry 
       }
       if (!entry.sickLeave) {
         return "'sickLeave' field is required";
+      } else {
+        if (entry.sickLeave.startDate > entry.sickLeave.endDate) {
+          return "'sickLeave' field is invalid";
+        }
       }
       break;
     case 'Hospital':
