@@ -146,16 +146,6 @@ const HealthCheckEntryForm = ({ afterCreate, diagnosis }: EntryFromProps) => {
             {HealthCheckRating[hover !== -1 ? 3 - hover + 1 : rating]}
           </Box>
         )}
-        {/* <TextField
-        sx={{mt: 2}}
-          label="HealthCheck rating"
-          id="rating"
-          fullWidth
-          variant="standard"
-          value={rating}
-          type="number"
-          onChange={({ target }) => setRating(Number(target.value))}
-        /> */}
         <Button sx={{ display: 'block', mb: 4 }} style={{ marginTop: '20px' }} type="submit" variant="outlined">
           Add
         </Button>
