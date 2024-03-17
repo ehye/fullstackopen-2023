@@ -1,21 +1,53 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import MaleIcon from '@mui/icons-material/Male';
 import FemaleIcon from '@mui/icons-material/Female';
 import TransgenderIcon from '@mui/icons-material/Transgender';
-import Box from '@mui/material/Box';
+import { Box, Rating } from '@mui/material';
+import { styled } from '@mui/material/styles';
 import { Diagnose, Entry, Gender, Patient } from '../../types';
 import patientService from '../../services/patients';
 import diagnoseService from '../../services/diagnose';
-import HospitalEntryItem from './HospitalEntryItem';
-import HealthCheckEntryItem from './HealthCheckEntryItem';
-import OccupationalHealthcareItem from './OccupationalHealthcareItem';
-import EntryForm from './EntryForm';
+import { HealthCheckEntryItem, HospitalEntryItem, OccupationalHealthcareItem } from './EntryItems';
+import HealthCheckEntryForm from './HealthCheckEntryForm';
+import HospitalEntryForm from './HospitalEntryForm';
+import OccupationalHealthcareForm from './OccupationalHealthcareForm';
+import Togglable from '../Togglable';
 
-const PatientDetail = () => {
+const ITEM_HEIGHT = 64;
+const ITEM_PADDING_TOP = 8;
+export const MenuProps = {
+  PaperProps: {
+    style: {
+      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+      width: 250,
+    },
+  },
+};
+
+export const StyledRating = styled(Rating)({
+  '& .MuiRating-iconFilled': {
+    color: '#ff6d75',
+  },
+  '& .MuiRating-iconHover': {
+    color: '#ff3d47',
+  },
+});
+
+export interface EntryFromProps {
+  diagnosis: Array<Diagnose>;
+  afterCreate: (addedEntry: Entry) => void;
+}
+
+interface TogglableProps {
+  toggleVisibility: () => void;
+}
+
+function PatientDetail() {
   const { id } = useParams();
   const [patient, setPatient] = useState<Patient>();
   const [diagnosis, setDiagnosis] = useState<Diagnose[]>([]);
+  const entryFormRef = useRef<TogglableProps | undefined>();
 
   useEffect(() => {
     patientService
@@ -92,7 +124,15 @@ const PatientDetail = () => {
           </h2>
           <p>ssn: {patient.ssn}</p>
           <p>occupation: {patient.occupation}</p>
-          <EntryForm afterCreate={updateEntries} />
+          <Togglable buttonLabel="Add HealthCheck Entry" toggleButtonLabel="cancel" ref={entryFormRef}>
+            <HealthCheckEntryForm afterCreate={updateEntries} diagnosis={diagnosis} />
+          </Togglable>
+          <Togglable buttonLabel="Add Hospital Entry" toggleButtonLabel="cancel" ref={entryFormRef}>
+            <HospitalEntryForm afterCreate={updateEntries} diagnosis={diagnosis} />
+          </Togglable>
+          <Togglable buttonLabel="Add Occupational Healthcare Entry" toggleButtonLabel="cancel" ref={entryFormRef}>
+            <OccupationalHealthcareForm afterCreate={updateEntries} diagnosis={diagnosis} />
+          </Togglable>
           <h3>entries</h3>
           {patient.entries.map((entry, i) => (
             <Box key={i} sx={{ border: '2px solid grey', marginBottom: '10px', padding: '5px' }}>
@@ -106,6 +146,6 @@ const PatientDetail = () => {
       )}
     </>
   );
-};
+}
 
 export default PatientDetail;
