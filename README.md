@@ -1,8 +1,8 @@
-# fullstackopen-2023
+# Full stack open 2023
 
 **Deep Dive Into Modern Web Development**
 
-## Full Stack open - University of Helsinki
+## 📖 Full Stack open - University of Helsinki
 
 This course serves as an introduction to modern web application development with JavaScript. The main focus is on building single page applications with ReactJS that use REST APIs built with Node.js. The course also contains a section on GraphQL, a modern alternative to REST APIs.
 
@@ -16,11 +16,11 @@ This course serves as an introduction to modern web application development with
 - Part 7 - React router, custom hooks, styling app with CSS and webpack
 - Part 8 - GraphQL
 - Part 9 - TypeScript
+- [Part 10 - React Native](https://github.com/ehye/rate-repository-app)
+- [Part 11 - CI/CD](https://github.com/ehye/blog-list-cicd)
+- [Part 12 - Containers](https://github.com/ehye/part12-containers-applications)
+- [Part 13 - Using relational databases](https://github.com/ehye/part13-using-relational-databases)
 
-## Certificates
+## 🎉Certificates
 
 ![certificate-fullstack.png](certificate-fullstack.png "certificate-fullstack")
-
-[certificate-graphql.png](https://studies.cs.helsinki.fi/stats/api/certificate/fs-graphql/en/f9ed212ef9fa142ebc2770932d0ac2f3 "certificate-graphql")
-
-[certificate-typescript.png](https://studies.cs.helsinki.fi/stats/api/certificate/fs-typescript/en/29860d1500a447561c74c1175550c158 "certificate-typescript.png")
